@@ -3,8 +3,10 @@ import { useState } from 'react'
 
 import { css } from '@emotion/react'
 
-import type { Board, Tile } from '../src/logic/board'
-import { movesForPiece, DEFAULT_BOARD } from '../src/logic/board'
+import type { Board, Position, Tile } from '../src/logic/board'
+import { DEFAULT_BOARD } from '../src/logic/board'
+import { movesForPiece } from '../src/logic/pieces'
+import { isPawn } from '../src/logic/pieces/pawn'
 
 const copyBoard = (board: Board) => {
   return [
@@ -22,6 +24,7 @@ export const Home: FC = () => {
   const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
 
   const [selected, setSelected] = useState<Tile | null>(null)
+  const [moves, setMoves] = useState<Position[]>([])
 
   const handleSelect = (tile: Tile | null) => {
     if (!tile?.piece?.type && !selected) return
@@ -29,6 +32,8 @@ export const Home: FC = () => {
       setSelected(null)
       return
     }
+
+    setMoves(movesForPiece(tile.piece, board))
     setSelected(tile)
   }
 
@@ -38,9 +43,8 @@ export const Home: FC = () => {
       const newBoard = copyBoard(prev)
       const selectedTile = newBoard[selected.position.y][selected.position.x]
       const tileToMoveTo = newBoard[tile.position.y][tile.position.x]
-      switch (selectedTile.piece?.type) {
-        case `pawn`:
-          selectedTile.piece.firstMove = false
+      if (isPawn(selectedTile.piece)) {
+        selectedTile.piece.firstMove = false
       }
 
       tileToMoveTo.piece = selected.piece
@@ -51,6 +55,7 @@ export const Home: FC = () => {
       return [...newBoard]
     })
 
+    setMoves([])
     setSelected(null)
   }
 
@@ -76,18 +81,20 @@ export const Home: FC = () => {
             const isSelected = selected?.piece?.id === tile.piece?.getId?.()
             const canMoveTo = () => {
               if (!selected?.piece) return false
-              for (const move of movesForPiece.pawn({
-                ...selected.piece,
-                board,
-              }) || []) {
+
+              let canMove = false
+              for (const move of moves) {
                 const pos = selected.position || { x: 0, y: 0 }
+
                 if (
                   pos.x + move.x === tile.position.x &&
                   pos.y + move.y === tile.position.y
                 ) {
-                  return true
+                  canMove = true
+                  break
                 }
               }
+              return canMove
             }
 
             return (
@@ -100,6 +107,7 @@ export const Home: FC = () => {
                   height: 50px;
                   width: 50px;
                   background-color: ${canMoveTo() ? `red` : bg};
+                  border: 1px solid #000;
                   cursor: ${canMoveTo() || tile.piece ? `pointer` : `default`};
                 `}
               >
