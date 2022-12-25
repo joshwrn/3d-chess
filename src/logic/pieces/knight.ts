@@ -1,6 +1,6 @@
 import type { Board, Position } from '../board'
 import type { Piece, PieceFactory } from './'
-import { getBasePiece } from './'
+import { checkPosition, getBasePiece } from './'
 
 export function isKnight(value: Knight | Piece | null): value is Knight {
   return value?.type === `knight`
@@ -13,8 +13,6 @@ export const knightMoves = ({
   piece: Knight
   board: Board
 }): Position[] => {
-  const { position } = piece
-
   const moves: Position[] = [
     {
       x: 1,
@@ -49,11 +47,8 @@ export const knightMoves = ({
       y: 2,
     },
   ].filter((move) => {
-    const { x, y } = move
-    const nextPosition = { x: position.x + x, y: position.y + y }
-    const nextTile = board[nextPosition.y]?.[nextPosition.x]
-    if (!nextTile) return false
-    if (nextTile.piece?.color === piece.color) return false
+    const check = checkPosition(piece, board, move)
+    if (check === `invalid`) return false
     return true
   })
 

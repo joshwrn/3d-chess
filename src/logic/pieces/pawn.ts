@@ -1,6 +1,6 @@
 import type { Board, Position } from '../board'
 import type { Piece, PieceFactory } from './'
-import { getBasePiece } from './'
+import { checkPosition, getBasePiece } from './'
 
 export function isPawn(value: Pawn | Piece | null): value is Pawn {
   return value?.type === `pawn`
@@ -13,7 +13,7 @@ export const pawnMoves = ({
   piece: Pawn
   board: Board
 }): Position[] => {
-  const { firstMove, color, position } = piece
+  const { firstMove, color } = piece
   const colorMultiplier = color === `white` ? -1 : 1
 
   const movesForward = [{ x: 0, y: 1 * colorMultiplier }]
@@ -21,9 +21,8 @@ export const pawnMoves = ({
     movesForward.push({ x: 0, y: 2 * colorMultiplier })
   }
   for (const move of movesForward) {
-    const { x, y } = move
-    const nextPosition = { x: position.x + x, y: position.y + y }
-    if (board[nextPosition.y]?.[nextPosition.x].piece) {
+    const check = checkPosition(piece, board, move)
+    if (check === `invalid` || check === `capture`) {
       movesForward.splice(
         movesForward.indexOf(move),
         movesForward.length - movesForward.indexOf(move),
@@ -35,14 +34,9 @@ export const pawnMoves = ({
     { x: 1, y: 1 * colorMultiplier },
     { x: -1, y: 1 * colorMultiplier },
   ].filter((move) => {
-    const { x, y } = move
-    const nextPosition = { x: position.x + x, y: position.y + y }
-    const nextTile = board[nextPosition.y]?.[nextPosition.x]
-    if (!nextTile) return false
-    if (!nextTile.piece || nextTile.piece.color === color) {
-      return false
-    }
-    return true
+    const check = checkPosition(piece, board, move)
+    if (check === `capture`) return true
+    if (check === `invalid`) return false
   })
 
   return [...movesForward, ...movesDiagonal]

@@ -13,11 +13,11 @@ export const bishopMoves = ({
   piece: Bishop
   board: Board
 }): Position[] => {
-  const rightDown = getFarMoves({ dir: { x: 1, y: 1 }, piece, board })
-  const leftUp = getFarMoves({ dir: { x: -1, y: -1 }, piece, board })
-  const leftDown = getFarMoves({ dir: { x: -1, y: 1 }, piece, board })
-  const rightUp = getFarMoves({ dir: { x: 1, y: -1 }, piece, board })
-  return [...rightDown, ...leftUp, ...leftDown, ...rightUp]
+  const moveRightDown = getFarMoves({ dir: { x: 1, y: 1 }, piece, board })
+  const moveLeftUp = getFarMoves({ dir: { x: -1, y: -1 }, piece, board })
+  const moveLeftDown = getFarMoves({ dir: { x: -1, y: 1 }, piece, board })
+  const moveRightUp = getFarMoves({ dir: { x: 1, y: -1 }, piece, board })
+  return [...moveRightDown, ...moveLeftUp, ...moveLeftDown, ...moveRightUp]
 }
 
 export const createBishop = ({ color, id, position }: PieceFactory): Bishop => {
