@@ -44,7 +44,7 @@ export const Home: FC = () => {
       }
 
       tileToMoveTo.piece = selected.piece
-        ? Object.assign({}, selected.piece)
+        ? Object.assign({}, { ...selected.piece, position: tile.position })
         : null
       selectedTile.piece = null
 
@@ -80,7 +80,7 @@ export const Home: FC = () => {
                 ...selected.piece,
                 board,
               }) || []) {
-                const pos = selected?.position || { x: 0, y: 0 }
+                const pos = selected.position || { x: 0, y: 0 }
                 if (
                   pos.x + move.x === tile.position.x &&
                   pos.y + move.y === tile.position.y

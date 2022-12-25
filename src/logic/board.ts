@@ -39,7 +39,6 @@ type MovesForPiece = {
 export const movesForPiece: MovesForPiece = {
   pawn: ({ firstMove, color, board, position }) => {
     const colorMultiplier = color === `white` ? -1 : 1
-    console.log({ firstMove })
 
     const movesForward = [{ x: 0, y: 1 * colorMultiplier }]
     if (firstMove) {
