@@ -5,9 +5,8 @@ export type Piece = {
   color: Color
   id: number
   getId: () => string
-  getMoves: (args: { board: Board }) => Position[]
   position: Position
-  firstMove?: boolean
+  firstMove: boolean
 }
 export type Board = Tile[][]
 
@@ -23,17 +22,24 @@ type MovesForPiece = {
     firstMove,
     color,
     board,
+    position,
   }: {
     board: Board
     firstMove: boolean
     color: Color
     position: Position
   }) => Position[]
+  bishop: () => Position[]
+  king: () => Position[]
+  knight: () => Position[]
+  queen: () => Position[]
+  rook: () => Position[]
 }
 
-const movesForPiece: MovesForPiece = {
+export const movesForPiece: MovesForPiece = {
   pawn: ({ firstMove, color, board, position }) => {
     const colorMultiplier = color === `white` ? -1 : 1
+    console.log({ firstMove })
 
     const movesForward = [{ x: 0, y: 1 * colorMultiplier }]
     if (firstMove) {
@@ -50,98 +56,94 @@ const movesForPiece: MovesForPiece = {
     const movesDiagonal = [
       { x: 1, y: 1 * colorMultiplier },
       { x: -1, y: 1 * colorMultiplier },
-    ]
-    const mD = []
-    for (const move of movesDiagonal) {
+    ].filter((move) => {
       const { x, y } = move
       const nextPosition = { x: position.x + x, y: position.y + y }
-      if (board[nextPosition.y][nextPosition.x].piece) {
-        mD.push(move)
+      const nextTile = board[nextPosition.y]?.[nextPosition.x]
+      if (!nextTile.piece) {
+        return false
       }
-    }
+      return true
+    })
 
-    return [...movesForward, ...mD]
+    return [...movesForward, ...movesDiagonal]
   },
+  rook: () => [],
+  knight: () => [],
+  bishop: () => [],
+  queen: () => [],
+  king: () => [],
 }
 
-type PieceArgs = { color: Color; id: number; type: PieceType }
+type PieceArgs = {
+  color: Color
+  id: number
+  type: PieceType
+}
 
-const createPiece = (args?: PieceArgs): Piece | null => {
+const createPiece = (
+  args?: PieceArgs & { position: Position },
+): Piece | null => {
   if (!args) return null
   switch (args.type) {
     case `pawn`:
-      return new Pawn(args.color, args.id, { x: 0, y: 0 })
+      return createPawn({
+        color: args.color,
+        id: args.id,
+        position: args.position,
+      })
     default:
       return null
   }
 }
 
-const newTile = (position: Position, piece?: PieceArgs): Tile => {
+export type Tile = {
+  position: Position
+  piece: Piece | null
+}
+export const createTile = (position: Position, piece?: PieceArgs): Tile => {
   return {
     position,
-    piece: createPiece(piece),
+    piece: piece ? createPiece({ ...piece, position }) : null,
   }
 }
 
-export class Tile {
-  public constructor(position: Position, piece?: PieceArgs) {
-    this.position = position
-    this.piece = (() => {
-      if (piece) {
-        switch (piece.type) {
-          case `pawn`:
-            return new Pawn(piece.color, piece.id, position)
-          default:
-            return null
-        }
-      }
-      return null
-    })()
-  }
-  public position: Position
-  public piece: Piece | null = null
+export type BoardPiece = {
+  color: Color
+  id: number
+  type: PieceType
+  position: Position
 }
 
-class BoardPiece {
-  public constructor(
-    color: Color,
-    id: number,
-    position: Position,
-    type: PieceType,
-  ) {
-    this.color = color
-    this.id = id
-    this.type = type
-    this.position = position
-  }
-  public color: Color
-  public id: number
-  public type: PieceType
-  public position: Position
-  public selected = false
+export type Pawn = BoardPiece & {
+  firstMove: boolean
+  getId: () => string
 }
-
-class Pawn extends BoardPiece {
-  public constructor(color: Color, id: number, position: Position) {
-    super(color, id, position, `pawn`)
-  }
-  public firstMove = true
-  public getMoves({ board }: { board: Board }) {
-    return movesForPiece.pawn({
-      firstMove: this.firstMove,
-      color: this.color,
-      position: this.position,
-      board,
-    })
-  }
-  public getId(): string {
-    return createId({ type: this.type, color: this.color, id: this.id })
+export const createPawn = ({
+  color,
+  id,
+  position,
+}: {
+  color: Color
+  id: number
+  position: Position
+}): Pawn => {
+  const firstMove = true
+  return {
+    color,
+    id,
+    type: `pawn`,
+    position,
+    firstMove,
+    getId: () => {
+      return createId({ type: `pawn`, color: color, id: id })
+    },
   }
 }
 
 export const DEFAULT_BOARD: Board = [
   [
-    new Tile(
+    createTile(
       { x: 0, y: 0 },
       {
         color: `black`,
@@ -149,7 +151,7 @@ export const DEFAULT_BOARD: Board = [
         type: `rook`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 1, y: 0 },
       {
         color: `black`,
@@ -157,7 +159,7 @@ export const DEFAULT_BOARD: Board = [
         type: `knight`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 2, y: 0 },
       {
         color: `black`,
@@ -165,7 +167,7 @@ export const DEFAULT_BOARD: Board = [
         type: `bishop`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 3, y: 0 },
       {
         color: `black`,
@@ -173,7 +175,7 @@ export const DEFAULT_BOARD: Board = [
         type: `queen`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 4, y: 0 },
       {
         color: `black`,
@@ -181,7 +183,7 @@ export const DEFAULT_BOARD: Board = [
         type: `king`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 5, y: 0 },
       {
         color: `black`,
@@ -189,7 +191,7 @@ export const DEFAULT_BOARD: Board = [
         type: `bishop`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 6, y: 0 },
       {
         color: `black`,
@@ -197,7 +199,7 @@ export const DEFAULT_BOARD: Board = [
         type: `knight`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 7, y: 0 },
       {
         color: `black`,
@@ -209,55 +211,53 @@ export const DEFAULT_BOARD: Board = [
   [
     ...Array(8)
       .fill(null)
-      .map(
-        (_, i) =>
-          new Tile(
-            { x: i, y: 1 },
-            {
-              color: `black`,
-              id: i + 1,
-              type: `pawn`,
-            },
-          ),
+      .map((_, i) =>
+        createTile(
+          { x: i, y: 1 },
+          {
+            color: `black`,
+            id: i + 1,
+            type: `pawn`,
+          },
+        ),
       ),
   ],
   [
     ...Array(8)
       .fill(null)
-      .map((_, i) => new Tile({ x: i, y: 2 })),
+      .map((_, i) => createTile({ x: i, y: 2 })),
   ],
   [
     ...Array(8)
       .fill(null)
-      .map((_, i) => new Tile({ x: i, y: 3 })),
+      .map((_, i) => createTile({ x: i, y: 3 })),
   ],
   [
     ...Array(8)
       .fill(null)
-      .map((_, i) => new Tile({ x: i, y: 4 })),
+      .map((_, i) => createTile({ x: i, y: 4 })),
   ],
   [
     ...Array(8)
       .fill(null)
-      .map((_, i) => new Tile({ x: i, y: 5 })),
+      .map((_, i) => createTile({ x: i, y: 5 })),
   ],
   [
     ...Array(8)
       .fill(null)
-      .map(
-        (_, i) =>
-          new Tile(
-            { x: i, y: 6 },
-            {
-              color: `white`,
-              id: i + 1,
-              type: `pawn`,
-            },
-          ),
+      .map((_, i) =>
+        createTile(
+          { x: i, y: 6 },
+          {
+            color: `white`,
+            id: i + 1,
+            type: `pawn`,
+          },
+        ),
       ),
   ],
   [
-    new Tile(
+    createTile(
       { x: 0, y: 7 },
       {
         color: `white`,
@@ -265,7 +265,7 @@ export const DEFAULT_BOARD: Board = [
         type: `rook`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 1, y: 7 },
       {
         color: `white`,
@@ -273,7 +273,7 @@ export const DEFAULT_BOARD: Board = [
         type: `knight`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 2, y: 7 },
       {
         color: `white`,
@@ -281,7 +281,7 @@ export const DEFAULT_BOARD: Board = [
         type: `bishop`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 3, y: 7 },
       {
         color: `white`,
@@ -289,7 +289,7 @@ export const DEFAULT_BOARD: Board = [
         type: `queen`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 4, y: 7 },
       {
         color: `white`,
@@ -297,7 +297,7 @@ export const DEFAULT_BOARD: Board = [
         type: `king`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 5, y: 7 },
       {
         color: `white`,
@@ -305,7 +305,7 @@ export const DEFAULT_BOARD: Board = [
         type: `bishop`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 6, y: 7 },
       {
         color: `white`,
@@ -313,7 +313,7 @@ export const DEFAULT_BOARD: Board = [
         type: `knight`,
       },
     ),
-    new Tile(
+    createTile(
       { x: 7, y: 7 },
       {
         color: `white`,
