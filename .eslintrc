@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    "unused-imports"
+  ],
+  "extends": [
+    "@eyecuelab/react"
+  ],
+  "rules": { 
+  "max-len": "off",
+  "max-lines": "off",
+  "unused-imports/no-unused-imports-ts": "warn",
+  "unused-imports/no-unused-vars-ts": "warn",
+  "no-console": "warn",
+  "react/no-unknown-property": ["error", { "ignore": ["css"] }]
+  }
+}
