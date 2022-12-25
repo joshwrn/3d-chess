@@ -64,33 +64,13 @@ export const createPiece = (
   if (!args) return null
   switch (args.type) {
     case `pawn`:
-      return createPawn({
-        color: args.color,
-        id: args.id,
-        position: args.position,
-        type: args.type,
-      })
+      return createPawn(args)
     case `rook`:
-      return createRook({
-        color: args.color,
-        id: args.id,
-        position: args.position,
-        type: args.type,
-      })
+      return createRook(args)
     case `knight`:
-      return createKnight({
-        color: args.color,
-        id: args.id,
-        position: args.position,
-        type: args.type,
-      })
+      return createKnight(args)
     case `bishop`:
-      return createBishop({
-        color: args.color,
-        id: args.id,
-        position: args.position,
-        type: args.type,
-      })
+      return createBishop(args)
     default:
       return null
   }
