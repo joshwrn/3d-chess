@@ -1,6 +1,6 @@
 import type { Board, Position } from '../board'
 import type { Piece, PieceFactory } from './'
-import { createId } from './'
+import { getBasePiece } from './'
 
 export function isPawn(value: Pawn | Piece | null): value is Pawn {
   return value?.type === `pawn`
@@ -51,18 +51,11 @@ export const pawnMoves = ({
 export const createPawn = ({ color, id, position }: PieceFactory): Pawn => {
   const firstMove = true
   return {
-    color,
-    id,
-    type: `pawn`,
-    position,
     firstMove,
-    getId: () => {
-      return createId({ type: `pawn`, color: color, id: id })
-    },
+    ...getBasePiece({ color, id, type: `pawn`, position }),
   }
 }
 
 export type Pawn = Piece & {
   firstMove: boolean
-  getId: () => string
 }

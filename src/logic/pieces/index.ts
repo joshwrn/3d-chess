@@ -1,4 +1,5 @@
 import type { Board, Position } from '../board'
+import { createKnight, isKnight, knightMoves } from './knight'
 import type { Pawn } from './pawn'
 import { createPawn, isPawn, pawnMoves } from './pawn'
 import { createRook, isRook, rookMoves } from './rook'
@@ -28,6 +29,9 @@ export const movesForPiece = (
   }
   if (isRook(piece)) {
     return rookMoves({ piece, board })
+  }
+  if (isKnight(piece)) {
+    return knightMoves({ piece, board })
   }
   return []
 }
@@ -64,6 +68,13 @@ export const createPiece = (
       })
     case `rook`:
       return createRook({
+        color: args.color,
+        id: args.id,
+        position: args.position,
+        type: args.type,
+      })
+    case `knight`:
+      return createKnight({
         color: args.color,
         id: args.id,
         position: args.position,

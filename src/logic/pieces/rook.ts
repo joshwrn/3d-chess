@@ -57,6 +57,4 @@ export const createRook = ({ color, id, position }: PieceFactory): Rook => {
   }
 }
 
-export type Rook = Piece & {
-  getId: () => string
-}
+export type Rook = Piece
