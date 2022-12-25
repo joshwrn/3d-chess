@@ -27,13 +27,12 @@ type PieceArgs = { color: string; id: number; piece: string }
 class Tile {
   public constructor(position: Position, piece?: PieceArgs) {
     this.position = position
-    this.piece = piece ? this.getPiece(piece) : null
+    this.piece = piece
+      ? new BoardPiece(piece.color, piece.id, position, piece.piece)
+      : null
   }
   public position: Position
   public piece: Piece | null = null
-  public getPiece({ color, id, piece }: PieceArgs): Piece | null {
-    return new BoardPiece(color, id, this.position, piece)
-  }
 }
 class BoardPiece {
   public constructor(
