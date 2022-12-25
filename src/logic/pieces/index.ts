@@ -1,5 +1,6 @@
 import type { Board, Position } from '../board'
 import { bishopMoves, createBishop, isBishop } from './bishop'
+import { createKing, isKing, kingMoves } from './king'
 import { createKnight, isKnight, knightMoves } from './knight'
 import type { Pawn } from './pawn'
 import { createPawn, isPawn, pawnMoves } from './pawn'
@@ -41,6 +42,9 @@ export const movesForPiece = (
   if (isQueen(piece)) {
     return queenMoves({ piece, board })
   }
+  if (isKing(piece)) {
+    return kingMoves({ piece, board })
+  }
   return []
 }
 
@@ -77,6 +81,8 @@ export const createPiece = (
       return createBishop(args)
     case `queen`:
       return createQueen(args)
+    case `king`:
+      return createKing(args)
     default:
       return null
   }
