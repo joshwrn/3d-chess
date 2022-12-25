@@ -1,4 +1,5 @@
 import type { Board, Position } from '../board'
+import { bishopMoves, createBishop, isBishop } from './bishop'
 import { createKnight, isKnight, knightMoves } from './knight'
 import type { Pawn } from './pawn'
 import { createPawn, isPawn, pawnMoves } from './pawn'
@@ -32,6 +33,9 @@ export const movesForPiece = (
   }
   if (isKnight(piece)) {
     return knightMoves({ piece, board })
+  }
+  if (isBishop(piece)) {
+    return bishopMoves({ piece, board })
   }
   return []
 }
@@ -80,9 +84,47 @@ export const createPiece = (
         position: args.position,
         type: args.type,
       })
+    case `bishop`:
+      return createBishop({
+        color: args.color,
+        id: args.id,
+        position: args.position,
+        type: args.type,
+      })
     default:
       return null
   }
+}
+
+export const getFarMoves = ({
+  dir,
+  piece,
+  board,
+}: {
+  dir: Position
+  piece: Piece
+  board: Board
+}): Position[] => {
+  const { position } = piece
+  const moves: Position[] = []
+  for (let i = 1; i < 8; i++) {
+    const getMove = (dir: Position) => ({ x: dir.x * i, y: dir.y * i })
+    const move = getMove(dir)
+    const { x, y } = move
+    const nextPosition = { x: position.x + x, y: position.y + y }
+    const row = board[nextPosition.y]
+    if (!row) break
+    const cur = row[nextPosition.x]
+    if (!cur) break
+    if (cur.piece) {
+      if (cur.piece?.color === oppositeColor(piece.color)) {
+        moves.push(move)
+      }
+      break
+    }
+    moves.push(move)
+  }
+  return moves
 }
 
 export const createId = (piece: PieceArgs | null): string => {
