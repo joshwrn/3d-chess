@@ -80,7 +80,7 @@ export const Home: FC = () => {
         >
           {row.map((tile, j) => {
             const bg = `${(i + j) % 2 === 0 ? `#a8968b` : `#5e3d1e`}`
-            const isSelected = selected?.piece?.id === tile.piece?.getId?.()
+            const isSelected = selected?.piece?.getId() === tile.piece?.getId?.()
             const canMoveTo = () => {
               if (!selected?.piece) return false
 
@@ -99,18 +99,18 @@ export const Home: FC = () => {
               return canMove
             }
 
+            const canMove = canMoveTo()
+
             return (
               <div
                 key={j}
-                onClick={() =>
-                  canMoveTo() ? handleMove(tile) : handleSelect(tile)
-                }
+                onClick={() => (canMove ? handleMove(tile) : handleSelect(tile))}
                 css={css`
                   height: 50px;
                   width: 50px;
-                  background-color: ${canMoveTo() ? `red` : bg};
+                  background-color: ${canMove ? `red` : bg};
                   border: 1px solid #000;
-                  cursor: ${canMoveTo() || tile.piece ? `pointer` : `default`};
+                  cursor: ${canMove || tile.piece ? `pointer` : `default`};
                 `}
               >
                 {tile && (
