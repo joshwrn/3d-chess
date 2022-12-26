@@ -2,17 +2,17 @@ import type { FC } from 'react'
 
 import type { Position } from '../logic/board'
 
-const getColor = (color: string, isSelected: boolean, canMoveTo: boolean) => {
+const getColor = (color: string, isSelected: boolean, canMoveHere: boolean) => {
   // if (isSelected && color === `white`) {
   //   return `#741818`
   // }
   // if (isSelected && color === `black`) {
   //   return `#371212`
   // }
-  if (canMoveTo) {
+  if (canMoveHere) {
     return `#ff0101`
   }
-  if (canMoveTo && color === `black`) {
+  if (canMoveHere && color === `black`) {
     return `#b42727`
   }
   if (color === `white`) {
@@ -24,17 +24,21 @@ const getColor = (color: string, isSelected: boolean, canMoveTo: boolean) => {
   return `purple`
 }
 
-const getEmissive = (color: string, isSelected: boolean, canMoveTo: boolean) => {
+const getEmissive = (
+  color: string,
+  isSelected: boolean,
+  canMoveHere: boolean,
+) => {
   // if (isSelected && color === `white`) {
   //   return `#876060`
   // }
   // if (isSelected && color === `black`) {
   //   return `#371212`
   // }
-  if (canMoveTo && color === `white`) {
+  if (canMoveHere && color === `white`) {
     return `#ff0000`
   }
-  if (canMoveTo && color === `black`) {
+  if (canMoveHere && color === `black`) {
     return `#c50000`
   }
   if (color === `white`) {
@@ -49,13 +53,13 @@ const getEmissive = (color: string, isSelected: boolean, canMoveTo: boolean) => 
 export const TileMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & {
     isSelected: boolean
-    canMoveTo: Position | null
+    canMoveHere: Position | null
   }
 > = ({ color, isSelected, ...props }) => (
   <meshPhysicalMaterial
     reflectivity={3}
-    color={getColor(color as string, isSelected, !!props.canMoveTo)}
-    emissive={getEmissive(color as string, isSelected, !!props.canMoveTo)}
+    color={getColor(color as string, isSelected, !!props.canMoveHere)}
+    emissive={getEmissive(color as string, isSelected, !!props.canMoveHere)}
     metalness={0.8}
     roughness={0.7}
     envMapIntensity={0.15}
@@ -68,18 +72,18 @@ export const TileMaterial: FC<
 
 export const TileComponent: FC<
   JSX.IntrinsicElements[`mesh`] & {
-    canMoveTo: Position | null
+    canMoveHere: Position | null
     color: string
     isSelected: boolean
   }
-> = ({ color, canMoveTo, isSelected, ...props }) => {
+> = ({ color, canMoveHere, isSelected, ...props }) => {
   return (
     <mesh scale={[1, 0.5, 1]} receiveShadow castShadow {...props}>
       <boxGeometry />
       <TileMaterial
         color={color}
         isSelected={isSelected}
-        canMoveTo={canMoveTo}
+        canMoveHere={canMoveHere}
       />
       {isSelected && <pointLight intensity={0.15} color="red" />}
     </mesh>

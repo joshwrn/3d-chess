@@ -26,7 +26,7 @@ type GLTFResult = GLTF & {
 export const PawnModel: FC<ModelProps> = ({
   movingTo,
   finishMovingPiece,
-  tileHeight,
+  newTileHeight,
   ...props
 }) => {
   const { nodes } = useGLTF(`/pawn.gltf`) as unknown as GLTFResult
@@ -40,8 +40,8 @@ export const PawnModel: FC<ModelProps> = ({
         initial={false}
         animate={
           movingTo
-            ? variants.move({ movingTo, tileHeight, ...props })
-            : variants.select(props)
+            ? variants.move({ movingTo, newTileHeight, ...props })
+            : variants.select({ movingTo, newTileHeight, ...props })
         }
         transition={movingTo ? transitions.moveTo : transitions.select}
         onAnimationComplete={() => {

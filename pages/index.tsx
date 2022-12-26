@@ -138,7 +138,7 @@ export const Home: FC = () => {
               const isSelected =
                 tile.piece && selected?.piece?.getId() === tile.piece.getId()
 
-              const canMove = checkIfSelectedPieceCanMoveHere({
+              const canMoveHere = checkIfSelectedPieceCanMoveHere({
                 tile,
                 moves,
                 selected,
@@ -156,15 +156,15 @@ export const Home: FC = () => {
                 scale: [0.15, 0.15, 0.15],
                 color: tile.piece?.color || `white`,
                 onClick: (e: ThreeMouseEvent) =>
-                  canMove
-                    ? startMovingPiece(e, tile, canMove)
+                  canMoveHere
+                    ? startMovingPiece(e, tile, canMoveHere)
                     : selectThisPiece(e, tile),
                 isSelected: isSelected ? true : false,
-                canMoveTo: canMove,
+                canMoveHere: canMoveHere,
                 movingTo: isSelected && movingTo ? movingTo : null,
                 finishMovingPiece: () =>
                   finishMovingPiece(movingTo?.tile ?? null),
-                tileHeight: newTileHeight,
+                newTileHeight: newTileHeight,
               }
 
               return (
@@ -173,11 +173,11 @@ export const Home: FC = () => {
                     color={bg}
                     position={[j, 0.25 + tileHeight, i]}
                     onClick={(e) =>
-                      canMove
-                        ? startMovingPiece(e, tile, canMove)
+                      canMoveHere
+                        ? startMovingPiece(e, tile, canMoveHere)
                         : selectThisPiece(e, tile)
                     }
-                    canMoveTo={canMove}
+                    canMoveHere={canMoveHere}
                     isSelected={isSelected ? true : false}
                   />
                   {tile.piece?.type === `pawn` && <PawnModel {...props} />}

@@ -1,15 +1,22 @@
 import type { FC } from 'react'
 
+import type {
+  AnimationControls,
+  TargetAndTransition,
+  VariantLabels,
+  Transition,
+} from 'framer-motion'
+
 import type { MovingTo } from '../../pages'
 import type { Position } from '../logic/board'
 
 export type ModelProps = JSX.IntrinsicElements[`group`] & {
   color: string
   isSelected: boolean
-  canMoveTo: Position | null
+  canMoveHere: Position | null
   movingTo: MovingTo | null
   finishMovingPiece: () => void
-  tileHeight: number
+  newTileHeight: number
 }
 export const PieceMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & { isSelected: boolean }
@@ -31,7 +38,10 @@ export const PieceMaterial: FC<
 export const FRAMER_MULTIPLIER = 6.66
 export const getDistance = (px: number): number => px * FRAMER_MULTIPLIER
 
-export const transitions: any = {
+export const transitions: {
+  select: Transition
+  moveTo: Transition & { y: Transition }
+} = {
   moveTo: {
     type: `spring`,
     stiffness: 200,
@@ -43,21 +53,29 @@ export const transitions: any = {
   },
 }
 
-export const variants: any = {
-  select: ({ isSelected }: { isSelected: boolean }) => ({
+export type VariantReturns =
+  | AnimationControls
+  | TargetAndTransition
+  | VariantLabels
+  | boolean
+export type VariantProps = {
+  isSelected: boolean
+  movingTo: MovingTo | null
+  newTileHeight: number
+}
+
+export const variants: {
+  select: (props: VariantProps) => VariantReturns
+  move: (props: VariantProps) => VariantReturns
+} = {
+  select: ({ isSelected }: VariantProps) => ({
     x: isSelected ? 0 : 0,
     y: isSelected ? 1.4 : 0.5,
     z: isSelected ? 0 : 0,
   }),
-  move: ({
-    movingTo,
-    tileHeight,
-  }: {
-    movingTo: MovingTo
-    tileHeight: number
-  }) => ({
-    x: getDistance(movingTo.move.x),
-    y: [1.4, 1.6, getDistance(tileHeight) + 0.5],
-    z: getDistance(movingTo.move.y),
+  move: ({ movingTo, newTileHeight }: VariantProps) => ({
+    x: getDistance(movingTo?.move.x ?? 0),
+    y: [1.4, 1.6, getDistance(newTileHeight) + 0.5],
+    z: getDistance(movingTo?.move.y ?? 0),
   }),
 }
