@@ -11,7 +11,7 @@ import type * as THREE from 'three'
 import type { GLTF } from 'three-stdlib'
 
 import type { ModelProps } from '.'
-import { PieceMaterial } from '.'
+import { MeshWrapper, PieceMaterial } from '.'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -22,13 +22,25 @@ type GLTFResult = GLTF & {
   }
 }
 
-export const RookComponent: FC<ModelProps> = (props) => {
+export const RookComponent: FC<ModelProps> = ({
+  movingTo,
+  finishMovingPiece,
+  newTileHeight,
+  isSelected,
+  ...props
+}) => {
   const { nodes } = useGLTF(`/rook.gltf`) as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
-      <mesh geometry={nodes.Object001001.geometry} scale={0.03} castShadow>
-        <PieceMaterial color={props.color} isSelected={props.isSelected} />
-      </mesh>
+      <MeshWrapper
+        geometry={nodes.Object001001.geometry}
+        movingTo={movingTo}
+        finishMovingPiece={finishMovingPiece}
+        newTileHeight={newTileHeight}
+        isSelected={isSelected}
+      >
+        <PieceMaterial color={props.color} isSelected={isSelected} />
+      </MeshWrapper>
     </group>
   )
 }
