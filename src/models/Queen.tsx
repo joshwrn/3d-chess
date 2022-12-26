@@ -26,12 +26,7 @@ export const QueenComponent: FC<ModelProps> = (props) => {
   const { nodes } = useGLTF(`/queen.gltf`) as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
-      <mesh
-        geometry={nodes.Object001003.geometry}
-        scale={0.03}
-        position={[0, 2.5, 0]}
-        castShadow
-      >
+      <mesh geometry={nodes.Object001003.geometry} scale={0.03} castShadow>
         <PieceMaterial color={props.color} isSelected={props.isSelected} />
       </mesh>
     </group>

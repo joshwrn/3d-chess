@@ -7,12 +7,11 @@ import React from 'react'
 import type { FC } from 'react'
 
 import { useGLTF } from '@react-three/drei'
-import { motion } from 'framer-motion-3d'
 import type * as THREE from 'three'
 import type { GLTF } from 'three-stdlib'
 
 import type { ModelProps } from '.'
-import { transitions, variants, PieceMaterial } from '.'
+import { MeshWrapper, PieceMaterial } from '.'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -27,31 +26,21 @@ export const PawnModel: FC<ModelProps> = ({
   movingTo,
   finishMovingPiece,
   newTileHeight,
+  isSelected,
   ...props
 }) => {
   const { nodes } = useGLTF(`/pawn.gltf`) as unknown as GLTFResult
   return (
     <group {...props} dispose={null} castShadow>
-      <motion.mesh
+      <MeshWrapper
+        movingTo={movingTo}
+        finishMovingPiece={finishMovingPiece}
+        newTileHeight={newTileHeight}
+        isSelected={isSelected}
         geometry={nodes.Object001.geometry}
-        scale={0.03}
-        castShadow
-        receiveShadow
-        initial={false}
-        animate={
-          movingTo
-            ? variants.move({ movingTo, newTileHeight, ...props })
-            : variants.select({ movingTo, newTileHeight, ...props })
-        }
-        transition={movingTo ? transitions.moveTo : transitions.select}
-        onAnimationComplete={() => {
-          if (movingTo) {
-            finishMovingPiece()
-          }
-        }}
       >
-        <PieceMaterial color={props.color} isSelected={props.isSelected} />
-      </motion.mesh>
+        <PieceMaterial color={props.color} isSelected={isSelected} />
+      </MeshWrapper>
     </group>
   )
 }

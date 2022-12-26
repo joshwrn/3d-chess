@@ -26,12 +26,7 @@ export const KingComponent: FC<ModelProps> = (props) => {
   const { nodes } = useGLTF(`/king.gltf`) as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
-      <mesh
-        geometry={nodes.Object001004.geometry}
-        scale={0.03}
-        position={[0, 3, 0]}
-        castShadow
-      >
+      <mesh geometry={nodes.Object001004.geometry} scale={0.03} castShadow>
         <PieceMaterial color={props.color} isSelected={props.isSelected} />
       </mesh>
     </group>

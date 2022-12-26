@@ -19,7 +19,12 @@ export const BorderMaterial: FC<
 
 export const Border: FC = () => {
   return (
-    <mesh receiveShadow position={[-0.5, -0.255, -0.5]} rotation={[0, 0, 0]}>
+    <mesh
+      onClick={(e) => e.stopPropagation()}
+      receiveShadow
+      position={[-0.5, -0.255, -0.5]}
+      rotation={[0, 0, 0]}
+    >
       <boxBufferGeometry attach="geometry" args={[9, 0.5, 9]} />
       <BorderMaterial />
     </mesh>

@@ -11,7 +11,7 @@ import type * as THREE from 'three'
 import type { GLTF } from 'three-stdlib'
 
 import type { ModelProps } from '.'
-import { PieceMaterial } from '.'
+import { MeshWrapper, PieceMaterial } from '.'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -22,18 +22,25 @@ type GLTFResult = GLTF & {
   }
 }
 
-export const BishopComponent: FC<ModelProps> = (props) => {
+export const BishopComponent: FC<ModelProps> = ({
+  movingTo,
+  finishMovingPiece,
+  newTileHeight,
+  isSelected,
+  ...props
+}) => {
   const { nodes } = useGLTF(`/bishop.gltf`) as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
-      <mesh
+      <MeshWrapper
+        movingTo={movingTo}
+        finishMovingPiece={finishMovingPiece}
+        newTileHeight={newTileHeight}
+        isSelected={isSelected}
         geometry={nodes.Object001002.geometry}
-        scale={0.03}
-        position={[0, 1.7, 0]}
-        castShadow
       >
-        <PieceMaterial color={props.color} isSelected={props.isSelected} />
-      </mesh>
+        <PieceMaterial color={props.color} isSelected={isSelected} />
+      </MeshWrapper>
     </group>
   )
 }

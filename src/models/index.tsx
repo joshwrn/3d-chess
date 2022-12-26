@@ -1,11 +1,14 @@
+import React from 'react'
 import type { FC } from 'react'
 
+import type { MeshProps } from '@react-three/fiber'
 import type {
   AnimationControls,
   TargetAndTransition,
   VariantLabels,
   Transition,
 } from 'framer-motion'
+import { motion } from 'framer-motion-3d'
 
 import type { MovingTo } from '../../pages'
 import type { Position } from '../logic/board'
@@ -34,6 +37,40 @@ export const PieceMaterial: FC<
     {...props}
   />
 )
+
+export const MeshWrapper: FC<
+  MeshProps & Omit<ModelProps, `canMoveHere` | `color`>
+> = ({
+  geometry,
+  movingTo,
+  finishMovingPiece,
+  newTileHeight,
+  isSelected,
+  children,
+}) => {
+  return (
+    <motion.mesh
+      geometry={geometry}
+      scale={0.03}
+      castShadow
+      receiveShadow
+      initial={false}
+      animate={
+        movingTo
+          ? variants.move({ movingTo, newTileHeight, isSelected })
+          : variants.select({ movingTo, newTileHeight, isSelected })
+      }
+      transition={movingTo ? transitions.moveTo : transitions.select}
+      onAnimationComplete={() => {
+        if (movingTo) {
+          finishMovingPiece()
+        }
+      }}
+    >
+      {children}
+    </motion.mesh>
+  )
+}
 
 export const FRAMER_MULTIPLIER = 6.66
 export const getDistance = (px: number): number => px * FRAMER_MULTIPLIER
@@ -70,12 +107,12 @@ export const variants: {
 } = {
   select: ({ isSelected }: VariantProps) => ({
     x: isSelected ? 0 : 0,
-    y: isSelected ? 1.4 : 0.5,
+    y: isSelected ? 1.4 : 0,
     z: isSelected ? 0 : 0,
   }),
   move: ({ movingTo, newTileHeight }: VariantProps) => ({
     x: getDistance(movingTo?.move.x ?? 0),
-    y: [1.4, 1.6, getDistance(newTileHeight) + 0.5],
+    y: [1.4, 1.6, getDistance(newTileHeight)],
     z: getDistance(movingTo?.move.y ?? 0),
   }),
 }

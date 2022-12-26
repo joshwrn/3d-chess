@@ -152,7 +152,7 @@ export const Home: FC = () => {
               const newTileHeight = tileToMoveToHeight - tileHeight
 
               const props: ModelProps = {
-                position: [j, 0.8 + tileHeight, i],
+                position: [j, 0.5 + tileHeight, i],
                 scale: [0.15, 0.15, 0.15],
                 color: tile.piece?.color || `white`,
                 onClick: (e: ThreeMouseEvent) =>
