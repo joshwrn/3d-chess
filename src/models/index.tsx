@@ -1,8 +1,15 @@
 import type { FC } from 'react'
 
+import type { MovingTo } from '../../pages'
+import type { Position } from '../logic/board'
+
 export type ModelProps = JSX.IntrinsicElements[`group`] & {
   color: string
   isSelected: boolean
+  canMoveTo: boolean
+  movingTo: MovingTo | null
+  handleMove: () => void
+  tileHeight: number
 }
 export const PieceMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & { isSelected: boolean }

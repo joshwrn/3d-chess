@@ -53,9 +53,6 @@ export const TileMaterial: FC<
   <meshPhysicalMaterial
     reflectivity={3}
     color={getColor(color as string, isSelected, props.canMoveTo)}
-    // emissive={
-    //   color === `white` ? `#323232` : color === `black` ? `#0c0c0c` : `#8a1010`
-    // }
     emissive={getEmissive(color as string, isSelected, props.canMoveTo)}
     metalness={0.8}
     roughness={0.7}
@@ -75,7 +72,7 @@ export const TileComponent: FC<
   }
 > = ({ color, canMoveTo, isSelected, ...props }) => {
   return (
-    <mesh scale={[1, 0.5, 1]} receiveShadow {...props}>
+    <mesh scale={[1, 0.5, 1]} receiveShadow castShadow {...props}>
       <boxGeometry />
       <TileMaterial
         color={color}

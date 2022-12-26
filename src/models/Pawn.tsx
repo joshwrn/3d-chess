@@ -7,11 +7,14 @@ import React from 'react'
 import type { FC } from 'react'
 
 import { useGLTF } from '@react-three/drei'
+import { motion } from 'framer-motion-3d'
 import type * as THREE from 'three'
 import type { GLTF } from 'three-stdlib'
 
 import type { ModelProps } from '.'
 import { PieceMaterial } from '.'
+import type { MovingTo } from '../../pages'
+import type { Position } from '../logic/board'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -22,21 +25,64 @@ type GLTFResult = GLTF & {
   }
 }
 
-export const PawnModel: FC<ModelProps & { isSelected: boolean }> = (props) => {
+export const PawnModel: FC<ModelProps & { isSelected: boolean }> = ({
+  movingTo,
+  handleMove,
+  tileHeight,
+  ...props
+}) => {
   const { nodes } = useGLTF(`/pawn.gltf`) as unknown as GLTFResult
   return (
     <group {...props} dispose={null} castShadow>
-      <mesh
+      <motion.mesh
         geometry={nodes.Object001.geometry}
         scale={0.03}
-        position={[0, 0.5, 0]}
         castShadow
         receiveShadow
+        initial={false}
+        animate={
+          movingTo
+            ? variants.move({ movingTo, tileHeight, ...props })
+            : variants.select(props)
+        }
+        transition={
+          movingTo
+            ? {
+                type: `spring`,
+                stiffness: 100,
+                damping: 20,
+              }
+            : { type: `spring` }
+        }
+        onAnimationComplete={() => {
+          if (movingTo) {
+            handleMove()
+          }
+        }}
       >
         <PieceMaterial color={props.color} isSelected={props.isSelected} />
-      </mesh>
+      </motion.mesh>
     </group>
   )
+}
+
+const variants = {
+  select: ({ isSelected }: { isSelected: boolean }) => ({
+    x: isSelected ? 0 : 0,
+    y: isSelected ? 1.4 : 0.5,
+    z: isSelected ? 0 : 0,
+  }),
+  move: ({
+    movingTo,
+    tileHeight,
+  }: {
+    movingTo: MovingTo
+    tileHeight: number
+  }) => ({
+    x: movingTo.move.x * 6.66,
+    y: tileHeight * 6.66 + 0.5,
+    z: movingTo.move.y * 6.66,
+  }),
 }
 
 useGLTF.preload(`/pawn.gltf`)
