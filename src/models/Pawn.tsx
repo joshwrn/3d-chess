@@ -8,7 +8,6 @@ import type { FC } from 'react'
 
 import { useGLTF } from '@react-three/drei'
 import type * as THREE from 'three'
-import { Material } from 'three'
 import type { GLTF } from 'three-stdlib'
 
 import type { ModelProps } from '.'
@@ -23,16 +22,18 @@ type GLTFResult = GLTF & {
   }
 }
 
-export const PawnModel: FC<ModelProps> = (props) => {
+export const PawnModel: FC<ModelProps & { isSelected: boolean }> = (props) => {
   const { nodes } = useGLTF(`/pawn.gltf`) as unknown as GLTFResult
   return (
-    <group {...props} dispose={null}>
+    <group {...props} dispose={null} castShadow>
       <mesh
         geometry={nodes.Object001.geometry}
         scale={0.03}
         position={[0, 0.5, 0]}
+        castShadow
+        receiveShadow
       >
-        <PieceMaterial color={props.color} />
+        <PieceMaterial color={props.color} isSelected={props.isSelected} />
       </mesh>
     </group>
   )

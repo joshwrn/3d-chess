@@ -2,11 +2,16 @@ import type { FC } from 'react'
 import { useState } from 'react'
 
 import { css } from '@emotion/react'
-import { OrbitControls } from '@react-three/drei'
+import {
+  Environment,
+  OrbitControls,
+  Reflector,
+  softShadows,
+} from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing'
 
 import { MiniMap } from '../src/components/MiniMap'
-import { TileComponent } from '../src/components/Tile'
 import type { Board, Position, Tile } from '../src/logic/board'
 import { DEFAULT_BOARD } from '../src/logic/board'
 import { movesForPiece } from '../src/logic/pieces'
@@ -17,7 +22,9 @@ import { KingComponent } from '../src/models/King'
 import { KnightComponent } from '../src/models/Knight'
 import { PawnModel } from '../src/models/Pawn'
 import { QueenComponent } from '../src/models/Queen'
+import { Reflection } from '../src/models/Reflection'
 import { RookComponent } from '../src/models/Rook'
+import { TileComponent } from '../src/models/Tile'
 
 const copyBoard = (board: Board) => {
   return [
@@ -82,6 +89,7 @@ export const Home: FC = () => {
         height: 100vh;
         width: 100vw;
         background-color: #000;
+        background: linear-gradient(180deg, #1b1b1b, #111);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -95,13 +103,19 @@ export const Home: FC = () => {
         handleMove={handleMove}
         handleSelect={handleSelect}
       />
-      <Canvas>
-        <OrbitControls enableZoom={false} />
-        <ambientLight intensity={0.25} />
-        <group position={[-5, -0.5, -5]}>
+      <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
+        <OrbitControls enableZoom={true} />
+        <Environment preset="dawn" />
+        <group position={[-4, -0.5, -4]}>
+          <pointLight
+            shadow-mapSize={[2048, 2048]}
+            castShadow
+            position={[0, 10, 0]}
+            intensity={0.2}
+          />
           {board.map((row, i) => {
             return row.map((tile, j) => {
-              const bg = `${(i + j) % 2 === 0 ? `#a8968b` : `#5e3d1e`}`
+              const bg = `${(i + j) % 2 === 0 ? `white` : `black`}`
               const isSelected =
                 tile.piece && selected?.piece?.getId() === tile.piece.getId()
               const canMoveTo = () => {
@@ -130,16 +144,19 @@ export const Home: FC = () => {
                 color: tile.piece?.color || `white`,
                 onClick: (e: ThreeMouseEvent) =>
                   canMove ? handleMove(e, tile) : handleSelect(e, tile),
+                isSelected: isSelected ? true : false,
               }
 
               return (
                 <group key={`${j}-${i}`}>
                   <TileComponent
-                    color={canMove ? `red` : bg}
-                    position={[j, 0, i]}
+                    color={bg}
+                    position={[j, 0.25, i]}
                     onClick={(e) =>
                       canMove ? handleMove(e, tile) : handleSelect(e, tile)
                     }
+                    canMoveTo={canMove}
+                    isSelected={isSelected ? true : false}
                   />
                   {tile.piece?.type === `pawn` && <PawnModel {...props} />}
                   {tile.piece?.type === `rook` && <RookComponent {...props} />}
@@ -156,7 +173,15 @@ export const Home: FC = () => {
             })
           })}
         </group>
-        <pointLight position={[10, 10, 10]} />
+
+        {/* <EffectComposer disableNormalPass>
+          <Bloom
+            luminanceThreshold={0.7}
+            mipmapBlur
+            luminanceSmoothing={0.0}
+            intensity={4}
+          />
+        </EffectComposer> */}
       </Canvas>
     </div>
   )

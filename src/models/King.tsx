@@ -30,8 +30,9 @@ export const KingComponent: FC<ModelProps> = (props) => {
         geometry={nodes.Object001004.geometry}
         scale={0.03}
         position={[0, 3, 0]}
+        castShadow
       >
-        <PieceMaterial color={props.color} />
+        <PieceMaterial color={props.color} isSelected={props.isSelected} />
       </mesh>
     </group>
   )

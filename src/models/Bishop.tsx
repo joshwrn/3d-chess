@@ -30,8 +30,9 @@ export const BishopComponent: FC<ModelProps> = (props) => {
         geometry={nodes.Object001002.geometry}
         scale={0.03}
         position={[0, 1.7, 0]}
+        castShadow
       >
-        <PieceMaterial color={props.color} />
+        <PieceMaterial color={props.color} isSelected={props.isSelected} />
       </mesh>
     </group>
   )
