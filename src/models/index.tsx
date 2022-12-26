@@ -8,7 +8,7 @@ export type ModelProps = JSX.IntrinsicElements[`group`] & {
   isSelected: boolean
   canMoveTo: Position | null
   movingTo: MovingTo | null
-  handleMove: () => void
+  finishMovingPiece: () => void
   tileHeight: number
 }
 export const PieceMaterial: FC<

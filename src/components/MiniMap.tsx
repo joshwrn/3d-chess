@@ -9,9 +9,9 @@ export const MiniMap: FC<{
   board: Board
   selected: Tile | null
   moves: Position[]
-  handleMove: (tile: Tile) => void
-  handleSelect: (e: ThreeMouseEvent, tile: Tile | null) => void
-}> = ({ board, selected, moves, handleMove, handleSelect }) => {
+  finishMovingPiece: (tile: Tile) => void
+  selectThisPiece: (e: ThreeMouseEvent, tile: Tile | null) => void
+}> = ({ board, selected, moves, finishMovingPiece, selectThisPiece }) => {
   return (
     <div
       css={css`
@@ -57,7 +57,7 @@ export const MiniMap: FC<{
               <div
                 key={j}
                 onClick={(e) =>
-                  canMove ? handleMove(tile) : handleSelect(e, tile)
+                  canMove ? finishMovingPiece(tile) : selectThisPiece(e, tile)
                 }
                 css={css`
                   height: 25px;

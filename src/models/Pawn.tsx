@@ -25,7 +25,7 @@ type GLTFResult = GLTF & {
 
 export const PawnModel: FC<ModelProps> = ({
   movingTo,
-  handleMove,
+  finishMovingPiece,
   tileHeight,
   ...props
 }) => {
@@ -46,7 +46,7 @@ export const PawnModel: FC<ModelProps> = ({
         transition={movingTo ? transitions.moveTo : transitions.select}
         onAnimationComplete={() => {
           if (movingTo) {
-            handleMove()
+            finishMovingPiece()
           }
         }}
       >

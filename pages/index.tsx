@@ -55,7 +55,7 @@ export const Home: FC = () => {
   const [moves, setMoves] = useState<Position[]>([])
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
 
-  const handleSelect = (e: ThreeMouseEvent, tile: Tile | null) => {
+  const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
     if (!tile?.piece?.type && !selected) return
     if (!tile?.piece) {
@@ -68,7 +68,7 @@ export const Home: FC = () => {
     setSelected(tile)
   }
 
-  const handleMove = (tile: Tile | null) => {
+  const finishMovingPiece = (tile: Tile | null) => {
     if (!selected) return
     if (!tile) return
     setBoard((prev) => {
@@ -91,7 +91,7 @@ export const Home: FC = () => {
     setSelected(null)
   }
 
-  const handleStartMoving = (
+  const startMovingPiece = (
     e: ThreeMouseEvent,
     tile: Tile,
     theMove: Position,
@@ -117,8 +117,8 @@ export const Home: FC = () => {
         board={board}
         selected={selected}
         moves={moves}
-        handleMove={handleMove}
-        handleSelect={handleSelect}
+        finishMovingPiece={finishMovingPiece}
+        selectThisPiece={selectThisPiece}
       /> */}
       <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
         <OrbitControls enableZoom={true} />
@@ -157,12 +157,13 @@ export const Home: FC = () => {
                 color: tile.piece?.color || `white`,
                 onClick: (e: ThreeMouseEvent) =>
                   canMove
-                    ? handleStartMoving(e, tile, canMove)
-                    : handleSelect(e, tile),
+                    ? startMovingPiece(e, tile, canMove)
+                    : selectThisPiece(e, tile),
                 isSelected: isSelected ? true : false,
                 canMoveTo: canMove,
                 movingTo: isSelected && movingTo ? movingTo : null,
-                handleMove: () => handleMove(movingTo?.tile ?? null),
+                finishMovingPiece: () =>
+                  finishMovingPiece(movingTo?.tile ?? null),
                 tileHeight: newTileHeight,
               }
 
@@ -173,8 +174,8 @@ export const Home: FC = () => {
                     position={[j, 0.25 + tileHeight, i]}
                     onClick={(e) =>
                       canMove
-                        ? handleStartMoving(e, tile, canMove)
-                        : handleSelect(e, tile)
+                        ? startMovingPiece(e, tile, canMove)
+                        : selectThisPiece(e, tile)
                     }
                     canMoveTo={canMove}
                     isSelected={isSelected ? true : false}
