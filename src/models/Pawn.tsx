@@ -12,9 +12,7 @@ import type * as THREE from 'three'
 import type { GLTF } from 'three-stdlib'
 
 import type { ModelProps } from '.'
-import { PieceMaterial } from '.'
-import type { MovingTo } from '../../pages'
-import type { Position } from '../logic/board'
+import { transitions, variants, PieceMaterial } from '.'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -25,7 +23,7 @@ type GLTFResult = GLTF & {
   }
 }
 
-export const PawnModel: FC<ModelProps & { isSelected: boolean }> = ({
+export const PawnModel: FC<ModelProps> = ({
   movingTo,
   handleMove,
   tileHeight,
@@ -45,15 +43,7 @@ export const PawnModel: FC<ModelProps & { isSelected: boolean }> = ({
             ? variants.move({ movingTo, tileHeight, ...props })
             : variants.select(props)
         }
-        transition={
-          movingTo
-            ? {
-                type: `spring`,
-                stiffness: 100,
-                damping: 20,
-              }
-            : { type: `spring` }
-        }
+        transition={movingTo ? transitions.moveTo : transitions.select}
         onAnimationComplete={() => {
           if (movingTo) {
             handleMove()
@@ -64,25 +54,6 @@ export const PawnModel: FC<ModelProps & { isSelected: boolean }> = ({
       </motion.mesh>
     </group>
   )
-}
-
-const variants = {
-  select: ({ isSelected }: { isSelected: boolean }) => ({
-    x: isSelected ? 0 : 0,
-    y: isSelected ? 1.4 : 0.5,
-    z: isSelected ? 0 : 0,
-  }),
-  move: ({
-    movingTo,
-    tileHeight,
-  }: {
-    movingTo: MovingTo
-    tileHeight: number
-  }) => ({
-    x: movingTo.move.x * 6.66,
-    y: tileHeight * 6.66 + 0.5,
-    z: movingTo.move.y * 6.66,
-  }),
 }
 
 useGLTF.preload(`/pawn.gltf`)

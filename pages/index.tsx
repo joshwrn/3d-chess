@@ -5,7 +5,6 @@ import { css } from '@emotion/react'
 import { Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 
-import { MiniMap } from '../src/components/MiniMap'
 import type { Board, Position, Tile } from '../src/logic/board'
 import { DEFAULT_BOARD } from '../src/logic/board'
 import { movesForPiece } from '../src/logic/pieces'
@@ -22,7 +21,7 @@ import { TileComponent } from '../src/models/Tile'
 
 const tileHeights = Array(64)
   .fill(0)
-  .map((_, i) => {
+  .map(() => {
     return Math.random() * 0.05
   })
 
