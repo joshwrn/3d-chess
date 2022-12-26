@@ -1,4 +1,4 @@
-import type { Board, Position } from '../board'
+import type { Board, Position, Tile } from '../board'
 import { bishopMoves, createBishop, isBishop } from './bishop'
 import { createKing, isKing, kingMoves } from './king'
 import { createKnight, isKnight, knightMoves } from './knight'
@@ -134,4 +134,31 @@ export const getFarMoves = ({
 
 export const createId = (piece: PieceArgs | null): string => {
   return `${piece?.type}-${piece?.color}-${piece?.id}`
+}
+
+export const checkIfSelectedPieceCanMoveHere = ({
+  selected,
+  moves,
+  tile,
+}: {
+  selected: Tile | null
+  moves: Position[]
+  tile: Tile
+}): Position | null => {
+  if (!selected?.piece) return null
+
+  let theMove: Position | null = null
+
+  for (const move of moves) {
+    const pos = selected.position || { x: 0, y: 0 }
+
+    if (
+      pos.x + move.x === tile.position.x &&
+      pos.y + move.y === tile.position.y
+    ) {
+      theMove = move
+      break
+    }
+  }
+  return theMove
 }

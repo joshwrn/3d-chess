@@ -7,7 +7,10 @@ import { Canvas } from '@react-three/fiber'
 
 import type { Board, Position, Tile } from '../src/logic/board'
 import { DEFAULT_BOARD } from '../src/logic/board'
-import { movesForPiece } from '../src/logic/pieces'
+import {
+  checkIfSelectedPieceCanMoveHere,
+  movesForPiece,
+} from '../src/logic/pieces'
 import { isPawn } from '../src/logic/pieces/pawn'
 import type { ModelProps } from '../src/models'
 import { BishopComponent } from '../src/models/Bishop'
@@ -50,10 +53,7 @@ export const Home: FC = () => {
 
   const [selected, setSelected] = useState<Tile | null>(null)
   const [moves, setMoves] = useState<Position[]>([])
-  const [movingTo, setMovingTo] = useState<{
-    move: Position
-    tile: Tile
-  } | null>(null)
+  const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
 
   const handleSelect = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
@@ -138,40 +138,27 @@ export const Home: FC = () => {
               const isSelected =
                 tile.piece && selected?.piece?.getId() === tile.piece.getId()
 
-              let theMove: Position | null = null
-              const canMoveTo = () => {
-                if (!selected?.piece) return false
-
-                let canMove = false
-
-                for (const move of moves) {
-                  const pos = selected.position || { x: 0, y: 0 }
-
-                  if (
-                    pos.x + move.x === tile.position.x &&
-                    pos.y + move.y === tile.position.y
-                  ) {
-                    canMove = true
-                    theMove = move
-                    break
-                  }
-                }
-                return canMove
-              }
-
-              const canMove = canMoveTo()
+              const canMove = checkIfSelectedPieceCanMoveHere({
+                tile,
+                moves,
+                selected,
+              })
               const tileHeight = tileHeights[j * i]
-              const newTileHeight =
+              const tileToMoveToHeight =
                 tileHeights[
                   (movingTo?.tile?.position.y ?? 0) *
                     (movingTo?.tile?.position.x ?? 0)
-                ] - tileHeight
+                ]
+              const newTileHeight = tileToMoveToHeight - tileHeight
 
               const props: ModelProps = {
                 position: [j, 0.8 + tileHeight, i],
                 scale: [0.15, 0.15, 0.15],
                 color: tile.piece?.color || `white`,
-                // onClick: (e: ThreeMouseEvent) => handleSelect(e, tile),
+                onClick: (e: ThreeMouseEvent) =>
+                  canMove
+                    ? handleStartMoving(e, tile, canMove)
+                    : handleSelect(e, tile),
                 isSelected: isSelected ? true : false,
                 canMoveTo: canMove,
                 movingTo: isSelected && movingTo ? movingTo : null,
@@ -185,8 +172,8 @@ export const Home: FC = () => {
                     color={bg}
                     position={[j, 0.25 + tileHeight, i]}
                     onClick={(e) =>
-                      canMove && theMove
-                        ? handleStartMoving(e, tile, theMove)
+                      canMove
+                        ? handleStartMoving(e, tile, canMove)
                         : handleSelect(e, tile)
                     }
                     canMoveTo={canMove}

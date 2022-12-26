@@ -1,5 +1,7 @@
 import type { FC } from 'react'
 
+import type { Position } from '../logic/board'
+
 const getColor = (color: string, isSelected: boolean, canMoveTo: boolean) => {
   // if (isSelected && color === `white`) {
   //   return `#741818`
@@ -47,13 +49,13 @@ const getEmissive = (color: string, isSelected: boolean, canMoveTo: boolean) => 
 export const TileMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & {
     isSelected: boolean
-    canMoveTo: boolean
+    canMoveTo: Position | null
   }
 > = ({ color, isSelected, ...props }) => (
   <meshPhysicalMaterial
     reflectivity={3}
-    color={getColor(color as string, isSelected, props.canMoveTo)}
-    emissive={getEmissive(color as string, isSelected, props.canMoveTo)}
+    color={getColor(color as string, isSelected, !!props.canMoveTo)}
+    emissive={getEmissive(color as string, isSelected, !!props.canMoveTo)}
     metalness={0.8}
     roughness={0.7}
     envMapIntensity={0.15}
@@ -66,7 +68,7 @@ export const TileMaterial: FC<
 
 export const TileComponent: FC<
   JSX.IntrinsicElements[`mesh`] & {
-    canMoveTo: boolean
+    canMoveTo: Position | null
     color: string
     isSelected: boolean
   }

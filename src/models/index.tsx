@@ -1,11 +1,12 @@
 import type { FC } from 'react'
 
 import type { MovingTo } from '../../pages'
+import type { Position } from '../logic/board'
 
 export type ModelProps = JSX.IntrinsicElements[`group`] & {
   color: string
   isSelected: boolean
-  canMoveTo: boolean
+  canMoveTo: Position | null
   movingTo: MovingTo | null
   handleMove: () => void
   tileHeight: number
@@ -28,7 +29,7 @@ export const PieceMaterial: FC<
 )
 
 export const FRAMER_MULTIPLIER = 6.66
-export const pxToDistance = (px: number): number => px * FRAMER_MULTIPLIER
+export const getDistance = (px: number): number => px * FRAMER_MULTIPLIER
 
 export const transitions: any = {
   moveTo: {
@@ -55,8 +56,8 @@ export const variants: any = {
     movingTo: MovingTo
     tileHeight: number
   }) => ({
-    x: pxToDistance(movingTo.move.x),
-    y: [1.4, 1.6, pxToDistance(tileHeight) + 0.5],
-    z: pxToDistance(movingTo.move.y),
+    x: getDistance(movingTo.move.x),
+    y: [1.4, 1.6, getDistance(tileHeight) + 0.5],
+    z: getDistance(movingTo.move.y),
   }),
 }
