@@ -7,6 +7,7 @@ import { Canvas } from '@react-three/fiber'
 
 import type { Board, Position, Tile } from '../src/logic/board'
 import { DEFAULT_BOARD } from '../src/logic/board'
+import type { Color } from '../src/logic/pieces'
 import {
   checkIfSelectedPieceCanMoveHere,
   movesForPiece,
@@ -28,7 +29,7 @@ const tileHeights = Array(64)
     return Math.random() * 0.05
   })
 
-const copyBoard = (board: Board) => {
+const copyBoard = (board: Board): Board => {
   return [
     ...board.map((row) => {
       return [
@@ -54,6 +55,7 @@ export const Home: FC = () => {
   const [selected, setSelected] = useState<Tile | null>(null)
   const [moves, setMoves] = useState<Position[]>([])
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
+  const [turn, setTurn] = useState<Color>(`white`)
 
   const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
@@ -85,7 +87,7 @@ export const Home: FC = () => {
       selectedTile.piece = null
       return [...newBoard]
     })
-
+    setTurn((prev) => (prev === `white` ? `black` : `white`))
     setMovingTo(null)
     setMoves([])
     setSelected(null)
@@ -158,14 +160,20 @@ export const Home: FC = () => {
                   ? tileId === movingToId
                   : false
 
+              const handleClick = (e: ThreeMouseEvent) => {
+                if (tile.piece && !canMoveHere && tile.piece?.color !== turn) {
+                  return
+                }
+                canMoveHere
+                  ? startMovingPiece(e, tile, canMoveHere)
+                  : selectThisPiece(e, tile)
+              }
+
               const props: ModelProps = {
                 position: [j, 0.5 + tileHeight, i],
                 scale: [0.15, 0.15, 0.15],
                 color: tile.piece?.color || `white`,
-                onClick: (e: ThreeMouseEvent) =>
-                  canMoveHere
-                    ? startMovingPiece(e, tile, canMoveHere)
-                    : selectThisPiece(e, tile),
+                onClick: handleClick,
                 isSelected: isSelected ? true : false,
                 canMoveHere: canMoveHere,
                 movingTo: isSelected && movingTo ? movingTo : null,
@@ -180,11 +188,7 @@ export const Home: FC = () => {
                   <TileComponent
                     color={bg}
                     position={[j, 0.25 + tileHeight, i]}
-                    onClick={(e) =>
-                      canMoveHere
-                        ? startMovingPiece(e, tile, canMoveHere)
-                        : selectThisPiece(e, tile)
-                    }
+                    onClick={handleClick}
                     canMoveHere={canMoveHere}
                     isSelected={isSelected ? true : false}
                   />
