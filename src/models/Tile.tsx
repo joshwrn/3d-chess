@@ -86,10 +86,6 @@ export const TileComponent: FC<
     isSelected: boolean
   }
 > = ({ color, canMoveHere, isSelected, ...props }) => {
-  const { intensity, visible } = useSpring({
-    intensity: isSelected ? 0.15 : 0,
-    visible: isSelected ? true : false,
-  })
   return (
     <mesh scale={[1, 0.5, 1]} receiveShadow castShadow {...props}>
       <boxGeometry />
@@ -98,8 +94,6 @@ export const TileComponent: FC<
         isSelected={isSelected}
         canMoveHere={canMoveHere}
       />
-      {/* @ts-ignore */}
-      <animated.pointLight intensity={intensity} color="red" visible={visible} />
     </mesh>
   )
 }

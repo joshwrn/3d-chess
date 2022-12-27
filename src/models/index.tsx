@@ -21,6 +21,7 @@ export type ModelProps = JSX.IntrinsicElements[`group`] & {
   finishMovingPiece: () => void
   newTileHeight: number
   pieceIsBeingReplaced: boolean
+  wasSelected: boolean
 }
 export const PieceMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & { isSelected: boolean }
@@ -51,6 +52,7 @@ export const MeshWrapper: FC<
   isSelected,
   children,
   pieceIsBeingReplaced,
+  wasSelected,
 }) => {
   return (
     <motion.mesh
@@ -75,6 +77,8 @@ export const MeshWrapper: FC<
           ? transitions.replace
           : isSelected
           ? transitions.select
+          : wasSelected
+          ? transitions.wasSelected
           : transitions.initial
       }
       onAnimationComplete={() => {
@@ -97,6 +101,7 @@ export const transitions: {
   moveTo: Transition & { y: Transition }
   initial: Transition
   replace: Transition
+  wasSelected: Transition
 } = {
   moveTo: {
     type: `spring`,
@@ -114,6 +119,10 @@ export const transitions: {
   },
   initial: {
     duration: 0,
+  },
+  wasSelected: {
+    type: `spring`,
+    duration: 0.5,
   },
 }
 

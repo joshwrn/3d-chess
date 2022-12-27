@@ -1,6 +1,8 @@
 import type { FC } from 'react'
 import { useState } from 'react'
 
+import { useSpring, animated } from '@react-spring/three'
+
 import type { MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
 import { DEFAULT_BOARD } from '../logic/board'
@@ -38,6 +40,7 @@ export const BoardComponent: FC = () => {
   const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
 
   const [selected, setSelected] = useState<Tile | null>(null)
+  const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [moves, setMoves] = useState<Position[]>([])
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [turn, setTurn] = useState<Color>(`white`)
@@ -53,6 +56,7 @@ export const BoardComponent: FC = () => {
     setMovingTo(null)
     setMoves(movesForPiece(tile.piece, board))
     setSelected(tile)
+    setLastSelected(tile)
   }
 
   const finishMovingPiece = (tile: Tile | null) => {
@@ -76,6 +80,7 @@ export const BoardComponent: FC = () => {
     setMovingTo(null)
     setMoves([])
     setSelected(null)
+    setLastSelected(null)
   }
 
   const startMovingPiece = (
@@ -87,6 +92,10 @@ export const BoardComponent: FC = () => {
     setMovingTo({ move: theMove, tile: tile })
   }
 
+  const { intensity } = useSpring({
+    intensity: selected ? 0.15 : 0,
+  })
+
   return (
     <group position={[-4, -0.5, -4]}>
       <pointLight
@@ -95,6 +104,16 @@ export const BoardComponent: FC = () => {
         position={[0, 10, 0]}
         intensity={0.35}
         color="#ffbdd6"
+      />
+      {/* @ts-ignore */}
+      <animated.pointLight
+        intensity={intensity}
+        color="red"
+        position={[
+          lastSelected?.position.x ?? 0,
+          0,
+          lastSelected?.position.y ?? 0,
+        ]}
       />
 
       {board.map((row, i) => {
@@ -136,6 +155,9 @@ export const BoardComponent: FC = () => {
             color: tile.piece?.color || `white`,
             onClick: handleClick,
             isSelected: isSelected ? true : false,
+            wasSelected: lastSelected
+              ? lastSelected?.piece?.getId() === tile.piece?.getId()
+              : false,
             canMoveHere: canMoveHere,
             movingTo: isSelected && movingTo ? movingTo : null,
             pieceIsBeingReplaced: pieceIsBeingReplaced ? true : false,

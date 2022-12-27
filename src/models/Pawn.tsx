@@ -28,6 +28,7 @@ export const PawnModel: FC<ModelProps> = ({
   newTileHeight,
   isSelected,
   pieceIsBeingReplaced,
+  wasSelected,
   ...props
 }) => {
   const { nodes } = useGLTF(`/pawn.gltf`) as unknown as GLTFResult
@@ -39,6 +40,7 @@ export const PawnModel: FC<ModelProps> = ({
         newTileHeight={newTileHeight}
         pieceIsBeingReplaced={pieceIsBeingReplaced}
         isSelected={isSelected}
+        wasSelected={wasSelected}
         geometry={nodes.Object001.geometry}
       >
         <PieceMaterial color={props.color} isSelected={isSelected} />
