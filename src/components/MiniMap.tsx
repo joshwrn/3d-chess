@@ -1,89 +1,128 @@
 import type { FC } from 'react'
+import { useState } from 'react'
 
 import { css } from '@emotion/react'
+import { BsMap } from 'react-icons/bs'
+import {
+  FaChessPawn,
+  FaChessKnight,
+  FaChessBishop,
+  FaChessRook,
+  FaChessQueen,
+  FaChessKing,
+} from 'react-icons/fa'
 
-import type { ThreeMouseEvent } from '../../pages'
 import type { Board, Position, Tile } from '../logic/board'
 
 export const MiniMap: FC<{
   board: Board
   selected: Tile | null
   moves: Position[]
-  finishMovingPiece: (tile: Tile) => void
-  selectThisPiece: (e: ThreeMouseEvent, tile: Tile | null) => void
-}> = ({ board, selected, moves, finishMovingPiece, selectThisPiece }) => {
+}> = ({ board, selected, moves }) => {
+  const [show, setShow] = useState<boolean>(false)
   return (
-    <div
-      css={css`
-        display: flex;
-        position: absolute;
-        flex-direction: column;
-        top: 0;
-        left: 0;
-        z-index: 1;
-      `}
-    >
-      {board.map((row, i) => (
+    <>
+      <div
+        css={css`
+          position: absolute;
+          top: 50px;
+          left: 50px;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          cursor: pointer;
+          svg {
+            color: #ffffff;
+          }
+        `}
+        onClick={() => setShow(!show)}
+      >
+        <BsMap size={30} />
+      </div>
+      {show && (
         <div
-          key={i}
           css={css`
             display: flex;
+            position: absolute;
+            flex-direction: column;
+            top: 50px;
+            left: 150px;
+            z-index: 1;
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border-radius: 7px;
+            pointer-events: none;
           `}
         >
-          {row.map((tile, j) => {
-            const bg = `${(i + j) % 2 === 0 ? `#a8968b` : `#5e3d1e`}`
-            const isSelected = selected?.piece?.getId() === tile.piece?.getId?.()
-            const canMoveTo = () => {
-              if (!selected?.piece) return false
+          {board.map((row, i) => (
+            <div
+              key={i}
+              css={css`
+                display: flex;
+              `}
+            >
+              {row.map((tile, j) => {
+                const bg = `${(i + j) % 2 === 0 ? `#a5a5a5` : `#676767`}`
+                const isSelected =
+                  selected?.piece?.getId() === tile.piece?.getId?.()
+                const canMoveTo = () => {
+                  if (!selected?.piece) return false
 
-              let canMove = false
-              for (const move of moves) {
-                const pos = selected.position || { x: 0, y: 0 }
+                  let canMove = false
+                  for (const move of moves) {
+                    const pos = selected.position || { x: 0, y: 0 }
 
-                if (
-                  pos.x + move.x === tile.position.x &&
-                  pos.y + move.y === tile.position.y
-                ) {
-                  canMove = true
-                  break
+                    if (
+                      pos.x + move.x === tile.position.x &&
+                      pos.y + move.y === tile.position.y
+                    ) {
+                      canMove = true
+                      break
+                    }
+                  }
+                  return canMove
                 }
-              }
-              return canMove
-            }
 
-            const canMove = canMoveTo()
+                const canMove = canMoveTo()
 
-            return (
-              <div
-                key={j}
-                onClick={(e) =>
-                  canMove ? finishMovingPiece(tile) : selectThisPiece(e, tile)
-                }
-                css={css`
-                  height: 25px;
-                  width: 25px;
-                  background-color: ${canMove ? `red` : bg};
-                  border: 1px solid #000;
-                  cursor: ${canMove || tile.piece ? `pointer` : `default`};
-                `}
-              >
-                {tile && (
-                  <>
-                    <p
-                      style={{
-                        color: isSelected ? `#f00` : tile.piece?.color,
-                        fontWeight: `bold`,
-                      }}
-                    >
-                      {tile.piece?.type.charAt(0)}
-                    </p>
-                  </>
-                )}
-              </div>
-            )
-          })}
+                return (
+                  <div
+                    key={j}
+                    css={css`
+                      height: 25px;
+                      width: 25px;
+                      background-color: ${canMove ? `red` : bg};
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      svg {
+                        color: ${isSelected ? `red` : tile.piece?.color};
+                      }
+                    `}
+                  >
+                    {tile && (
+                      <>
+                        {tile.piece?.type === `pawn` && <FaChessPawn />}
+                        {tile.piece?.type === `knight` && <FaChessKnight />}
+                        {tile.piece?.type === `bishop` && <FaChessBishop />}
+                        {tile.piece?.type === `rook` && <FaChessRook />}
+                        {tile.piece?.type === `queen` && <FaChessQueen />}
+                        {tile.piece?.type === `king` && <FaChessKing />}
+                      </>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      )}
+    </>
   )
 }

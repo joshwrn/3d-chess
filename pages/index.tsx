@@ -1,11 +1,14 @@
 import type { FC } from 'react'
+import { useState } from 'react'
 
 import { css } from '@emotion/react'
 import { Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 
 import { BoardComponent } from '../src/components/Board'
-import type { Position, Tile } from '../src/logic/board'
+import { MiniMap } from '../src/components/MiniMap'
+import type { Board, Position, Tile } from '../src/logic/board'
+import { DEFAULT_BOARD } from '../src/logic/board'
 import { Border } from '../src/models/Border'
 
 export type ThreeMouseEvent = {
@@ -17,6 +20,9 @@ export type MovingTo = {
 }
 
 export const Home: FC = () => {
+  const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
+  const [selected, setSelected] = useState<Tile | null>(null)
+  const [moves, setMoves] = useState<Position[]>([])
   return (
     <div
       css={css`
@@ -30,11 +36,19 @@ export const Home: FC = () => {
         flex-direction: column;
       `}
     >
+      <MiniMap board={board} selected={selected} moves={moves} />
       <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
         <OrbitControls enableZoom={true} />
         <Environment preset="dawn" />
         <Border />
-        <BoardComponent />
+        <BoardComponent
+          selected={selected}
+          setSelected={setSelected}
+          board={board}
+          setBoard={setBoard}
+          moves={moves}
+          setMoves={setMoves}
+        />
       </Canvas>
     </div>
   )

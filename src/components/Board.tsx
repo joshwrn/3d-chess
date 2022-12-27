@@ -1,11 +1,10 @@
 import type { FC } from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { useSpring, animated } from '@react-spring/three'
 
 import type { MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
-import { DEFAULT_BOARD } from '../logic/board'
 import type { Color } from '../logic/pieces'
 import { checkIfSelectedPieceCanMoveHere, movesForPiece } from '../logic/pieces'
 import { isPawn } from '../logic/pieces/pawn'
@@ -37,12 +36,15 @@ const copyBoard = (board: Board): Board => {
   ]
 }
 
-export const BoardComponent: FC = () => {
-  const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
-
-  const [selected, setSelected] = useState<Tile | null>(null)
+export const BoardComponent: FC<{
+  selected: Tile | null
+  setSelected: (tile: Tile | null) => void
+  board: Board
+  setBoard: React.Dispatch<React.SetStateAction<Board>>
+  moves: Position[]
+  setMoves: (moves: Position[]) => void
+}> = ({ selected, setSelected, board, setBoard, moves, setMoves }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
-  const [moves, setMoves] = useState<Position[]>([])
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [turn, setTurn] = useState<Color>(`white`)
   const [redLightPosition, setRedLightPosition] = useState<Position>({
