@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import type { FC } from 'react'
 
-import type { MeshProps } from '@react-three/fiber'
 import type {
   AnimationControls,
   TargetAndTransition,
@@ -42,10 +41,7 @@ export const PieceMaterial: FC<
   />
 )
 
-export const MeshWrapper: FC<
-  MeshProps & Omit<ModelProps, `canMoveHere` | `color`>
-> = ({
-  geometry,
+export const MeshWrapper: FC<ModelProps> = ({
   movingTo,
   finishMovingPiece,
   newTileHeight,
@@ -53,42 +49,48 @@ export const MeshWrapper: FC<
   children,
   pieceIsBeingReplaced,
   wasSelected,
+  ...props
 }) => {
+  const ref = useRef(null)
+  const meshRef = useRef(null)
   return (
-    <motion.mesh
-      geometry={geometry}
-      scale={0.03}
-      castShadow
-      receiveShadow
-      initial={false}
-      animate={
-        movingTo
-          ? variants.move({ movingTo, newTileHeight, isSelected })
-          : pieceIsBeingReplaced
-          ? variants.replace({ movingTo, newTileHeight, isSelected })
-          : isSelected
-          ? variants.select({ movingTo, newTileHeight, isSelected })
-          : variants.initial({ movingTo, newTileHeight, isSelected })
-      }
-      transition={
-        movingTo
-          ? transitions.moveTo
-          : pieceIsBeingReplaced
-          ? transitions.replace
-          : isSelected
-          ? transitions.select
-          : wasSelected
-          ? transitions.wasSelected
-          : transitions.initial
-      }
-      onAnimationComplete={() => {
-        if (movingTo) {
-          finishMovingPiece()
+    <group ref={ref} {...props} dispose={null} castShadow>
+      <motion.mesh
+        ref={meshRef}
+        scale={0.03}
+        castShadow
+        receiveShadow
+        initial={false}
+        animate={
+          movingTo
+            ? variants.move({ movingTo, newTileHeight, isSelected })
+            : pieceIsBeingReplaced
+            ? variants.replace({ movingTo, newTileHeight, isSelected })
+            : isSelected
+            ? variants.select({ movingTo, newTileHeight, isSelected })
+            : variants.initial({ movingTo, newTileHeight, isSelected })
         }
-      }}
-    >
-      {children}
-    </motion.mesh>
+        transition={
+          movingTo
+            ? transitions.moveTo
+            : pieceIsBeingReplaced
+            ? transitions.replace
+            : isSelected
+            ? transitions.select
+            : wasSelected
+            ? transitions.wasSelected
+            : transitions.initial
+        }
+        onAnimationComplete={() => {
+          if (movingTo) {
+            finishMovingPiece()
+          }
+        }}
+      >
+        {children}
+        <PieceMaterial color={props.color} isSelected={isSelected} />
+      </motion.mesh>
+    </group>
   )
 }
 

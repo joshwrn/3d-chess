@@ -10,6 +10,7 @@ import type { Color } from '../logic/pieces'
 import { checkIfSelectedPieceCanMoveHere, movesForPiece } from '../logic/pieces'
 import { isPawn } from '../logic/pieces/pawn'
 import type { ModelProps } from '../models'
+import { MeshWrapper } from '../models'
 import { BishopComponent } from '../models/Bishop'
 import { KingComponent } from '../models/King'
 import { KnightComponent } from '../models/Knight'
@@ -174,12 +175,14 @@ export const BoardComponent: FC = () => {
                 canMoveHere={canMoveHere}
                 isSelected={isSelected ? true : false}
               />
-              {tile.piece?.type === `pawn` && <PawnModel {...props} />}
-              {tile.piece?.type === `rook` && <RookComponent {...props} />}
-              {tile.piece?.type === `knight` && <KnightComponent {...props} />}
-              {tile.piece?.type === `bishop` && <BishopComponent {...props} />}
-              {tile.piece?.type === `queen` && <QueenComponent {...props} />}
-              {tile.piece?.type === `king` && <KingComponent {...props} />}
+              <MeshWrapper {...props}>
+                {tile.piece?.type === `pawn` && <PawnModel />}
+                {tile.piece?.type === `rook` && <RookComponent />}
+                {tile.piece?.type === `knight` && <KnightComponent />}
+                {tile.piece?.type === `bishop` && <BishopComponent />}
+                {tile.piece?.type === `queen` && <QueenComponent />}
+                {tile.piece?.type === `king` && <KingComponent />}
+              </MeshWrapper>
             </group>
           )
         })
