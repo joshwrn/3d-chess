@@ -1,5 +1,7 @@
 import type { FC } from 'react'
 
+import { useSpring, animated } from '@react-spring/three'
+
 import type { Position } from '../logic/board'
 
 const getColor = (color: string, isSelected: boolean, canMoveHere: boolean) => {
@@ -55,20 +57,27 @@ export const TileMaterial: FC<
     isSelected: boolean
     canMoveHere: Position | null
   }
-> = ({ color, isSelected, ...props }) => (
-  <meshPhysicalMaterial
-    reflectivity={3}
-    color={getColor(color as string, isSelected, !!props.canMoveHere)}
-    emissive={getEmissive(color as string, isSelected, !!props.canMoveHere)}
-    metalness={0.8}
-    roughness={0.7}
-    envMapIntensity={0.15}
-    // clearcoat={1}
-    // clearcoatRoughness={0.25}
-    attach="material"
-    {...props}
-  />
-)
+> = ({ color, canMoveHere, isSelected, ...props }) => {
+  const { tileColor, emissiveColor } = useSpring({
+    tileColor: getColor(color as string, isSelected, !!canMoveHere),
+    emissiveColor: getEmissive(color as string, isSelected, !!canMoveHere),
+  })
+  return (
+    <>
+      {/* @ts-ignore */}
+      <animated.meshPhysicalMaterial
+        reflectivity={3}
+        color={tileColor}
+        emissive={emissiveColor}
+        metalness={0.8}
+        roughness={0.7}
+        envMapIntensity={0.15}
+        attach="material"
+        {...props}
+      />
+    </>
+  )
+}
 
 export const TileComponent: FC<
   JSX.IntrinsicElements[`mesh`] & {
@@ -77,6 +86,9 @@ export const TileComponent: FC<
     isSelected: boolean
   }
 > = ({ color, canMoveHere, isSelected, ...props }) => {
+  const { intensity } = useSpring({
+    intensity: isSelected ? 0.15 : 0,
+  })
   return (
     <mesh scale={[1, 0.5, 1]} receiveShadow castShadow {...props}>
       <boxGeometry />
@@ -85,7 +97,8 @@ export const TileComponent: FC<
         isSelected={isSelected}
         canMoveHere={canMoveHere}
       />
-      {isSelected && <pointLight intensity={0.15} color="red" />}
+      {/* @ts-ignore */}
+      <animated.pointLight intensity={intensity} color="red" />
     </mesh>
   )
 }

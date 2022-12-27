@@ -1,9 +1,5 @@
 import type { FC } from 'react'
-import React, { useState } from 'react'
-
-import { useFrame } from '@react-three/fiber'
-import { useMotionValue } from 'framer-motion'
-import { motion } from 'framer-motion-3d'
+import { useState } from 'react'
 
 import type { MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
@@ -46,18 +42,6 @@ export const BoardComponent: FC = () => {
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [turn, setTurn] = useState<Color>(`white`)
 
-  const whiteLight = useMotionValue(0.2)
-  const blackLight = useMotionValue(0.2)
-
-  useFrame(() => {
-    if (turn === `white`) {
-      whiteLight.set(1)
-      blackLight.set(0.2)
-    } else {
-      whiteLight.set(0.2)
-      blackLight.set(1)
-    }
-  })
   const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
     if (!tile?.piece?.type && !selected) return
@@ -102,31 +86,14 @@ export const BoardComponent: FC = () => {
     e.stopPropagation()
     setMovingTo({ move: theMove, tile: tile })
   }
+
   return (
     <group position={[-4, -0.5, -4]}>
-      {/* <mesh position={[3.5, 3, 0]}>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="#000" />
-          </mesh> */}
-
-      <motion.pointLight
-        position={[3.5, 3, 7]}
-        shadow-mapSize={[2048, 2048]}
-        castShadow
-        intensity={whiteLight as unknown as number}
-      />
-      {/* <motion.pointLight
-            position={[3.5, 3, 0]}
-            shadow-mapSize={[2048, 2048]}
-            castShadow
-            intensity={whiteLightTransform}
-          /> */}
-
       <pointLight
         shadow-mapSize={[2048, 2048]}
         castShadow
         position={[0, 10, 0]}
-        intensity={0.2}
+        intensity={0.35}
         color="#ffbdd6"
       />
 

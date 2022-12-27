@@ -30,13 +30,6 @@ export const Home: FC = () => {
         flex-direction: column;
       `}
     >
-      {/* <MiniMap
-        board={board}
-        selected={selected}
-        moves={moves}
-        finishMovingPiece={finishMovingPiece}
-        selectThisPiece={selectThisPiece}
-      /> */}
       <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
         <OrbitControls enableZoom={true} />
         <Environment preset="dawn" />
