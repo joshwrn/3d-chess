@@ -167,6 +167,8 @@ export const BoardComponent: FC = () => {
             newTileHeight: newTileHeight,
           }
 
+          const pieceId = tile.piece?.getId() ?? `empty-${j}-${i}`
+
           return (
             <group key={`${j}-${i}`}>
               <TileComponent
@@ -176,7 +178,7 @@ export const BoardComponent: FC = () => {
                 canMoveHere={canMoveHere}
                 isSelected={isSelected ? true : false}
               />
-              <MeshWrapper {...props}>
+              <MeshWrapper key={pieceId} {...props}>
                 {tile.piece?.type === `pawn` && <PawnModel />}
                 {tile.piece?.type === `rook` && <RookComponent />}
                 {tile.piece?.type === `knight` && <KnightComponent />}
