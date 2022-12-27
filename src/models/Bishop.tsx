@@ -27,6 +27,7 @@ export const BishopComponent: FC<ModelProps> = ({
   finishMovingPiece,
   newTileHeight,
   isSelected,
+  pieceIsBeingReplaced,
   ...props
 }) => {
   const { nodes } = useGLTF(`/bishop.gltf`) as unknown as GLTFResult
@@ -38,6 +39,7 @@ export const BishopComponent: FC<ModelProps> = ({
         newTileHeight={newTileHeight}
         isSelected={isSelected}
         geometry={nodes.Object001002.geometry}
+        pieceIsBeingReplaced={pieceIsBeingReplaced}
       >
         <PieceMaterial color={props.color} isSelected={isSelected} />
       </MeshWrapper>

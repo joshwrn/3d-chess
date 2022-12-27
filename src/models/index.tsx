@@ -20,6 +20,7 @@ export type ModelProps = JSX.IntrinsicElements[`group`] & {
   movingTo: MovingTo | null
   finishMovingPiece: () => void
   newTileHeight: number
+  pieceIsBeingReplaced: boolean
 }
 export const PieceMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & { isSelected: boolean }
@@ -34,6 +35,8 @@ export const PieceMaterial: FC<
     envMapIntensity={0.2}
     clearcoat={1}
     clearcoatRoughness={0.1}
+    opacity={1}
+    transparent={true}
     {...props}
   />
 )
@@ -47,6 +50,7 @@ export const MeshWrapper: FC<
   newTileHeight,
   isSelected,
   children,
+  pieceIsBeingReplaced,
 }) => {
   return (
     <motion.mesh
@@ -58,9 +62,21 @@ export const MeshWrapper: FC<
       animate={
         movingTo
           ? variants.move({ movingTo, newTileHeight, isSelected })
-          : variants.select({ movingTo, newTileHeight, isSelected })
+          : pieceIsBeingReplaced
+          ? variants.replace({ movingTo, newTileHeight, isSelected })
+          : isSelected
+          ? variants.select({ movingTo, newTileHeight, isSelected })
+          : variants.initial({ movingTo, newTileHeight, isSelected })
       }
-      transition={movingTo ? transitions.moveTo : transitions.select}
+      transition={
+        movingTo
+          ? transitions.moveTo
+          : pieceIsBeingReplaced
+          ? transitions.replace
+          : isSelected
+          ? transitions.select
+          : transitions.initial
+      }
       onAnimationComplete={() => {
         if (movingTo) {
           finishMovingPiece()
@@ -73,11 +89,14 @@ export const MeshWrapper: FC<
 }
 
 export const FRAMER_MULTIPLIER = 6.66
-export const getDistance = (px: number): number => px * FRAMER_MULTIPLIER
+export const getDistance = (px?: number): number =>
+  px ? px * FRAMER_MULTIPLIER : 0
 
 export const transitions: {
   select: Transition
   moveTo: Transition & { y: Transition }
+  initial: Transition
+  replace: Transition
 } = {
   moveTo: {
     type: `spring`,
@@ -87,6 +106,14 @@ export const transitions: {
   },
   select: {
     type: `spring`,
+  },
+  replace: {
+    type: `spring`,
+    stiffness: 50,
+    damping: 5,
+  },
+  initial: {
+    duration: 0,
   },
 }
 
@@ -101,18 +128,29 @@ export type VariantProps = {
   newTileHeight: number
 }
 
+type VariantFunction = (props: VariantProps) => VariantReturns
 export const variants: {
-  select: (props: VariantProps) => VariantReturns
-  move: (props: VariantProps) => VariantReturns
+  select: VariantFunction
+  move: VariantFunction
+  replace: VariantFunction
+  initial: VariantFunction
 } = {
+  initial: () => ({
+    x: 0,
+  }),
   select: ({ isSelected }: VariantProps) => ({
-    x: isSelected ? 0 : 0,
+    x: 0,
     y: isSelected ? 1.4 : 0,
-    z: isSelected ? 0 : 0,
+    z: 0,
   }),
   move: ({ movingTo, newTileHeight }: VariantProps) => ({
-    x: getDistance(movingTo?.move.x ?? 0),
+    x: getDistance(movingTo?.move.x),
     y: [1.4, 1.6, getDistance(newTileHeight)],
-    z: getDistance(movingTo?.move.y ?? 0),
+    z: getDistance(movingTo?.move.y),
+  }),
+  replace: () => ({
+    y: 100,
+    x: 0,
+    z: 0,
   }),
 }

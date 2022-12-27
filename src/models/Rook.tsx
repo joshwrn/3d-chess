@@ -27,6 +27,7 @@ export const RookComponent: FC<ModelProps> = ({
   finishMovingPiece,
   newTileHeight,
   isSelected,
+  pieceIsBeingReplaced,
   ...props
 }) => {
   const { nodes } = useGLTF(`/rook.gltf`) as unknown as GLTFResult
@@ -38,6 +39,7 @@ export const RookComponent: FC<ModelProps> = ({
         finishMovingPiece={finishMovingPiece}
         newTileHeight={newTileHeight}
         isSelected={isSelected}
+        pieceIsBeingReplaced={pieceIsBeingReplaced}
       >
         <PieceMaterial color={props.color} isSelected={isSelected} />
       </MeshWrapper>

@@ -27,6 +27,7 @@ export const KingComponent: FC<ModelProps> = ({
   finishMovingPiece,
   newTileHeight,
   isSelected,
+  pieceIsBeingReplaced,
   ...props
 }) => {
   const { nodes } = useGLTF(`/king.gltf`) as unknown as GLTFResult
@@ -38,6 +39,7 @@ export const KingComponent: FC<ModelProps> = ({
         newTileHeight={newTileHeight}
         isSelected={isSelected}
         geometry={nodes.Object001004.geometry}
+        pieceIsBeingReplaced={pieceIsBeingReplaced}
       >
         <PieceMaterial color={props.color} isSelected={isSelected} />
       </MeshWrapper>

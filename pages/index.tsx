@@ -151,6 +151,13 @@ export const Home: FC = () => {
                 ]
               const newTileHeight = tileToMoveToHeight - tileHeight
 
+              const movingToId = movingTo?.tile?.piece?.getId()
+              const tileId = tile.piece?.getId()
+              const pieceIsBeingReplaced =
+                movingTo?.tile.piece && tile.piece
+                  ? tileId === movingToId
+                  : false
+
               const props: ModelProps = {
                 position: [j, 0.5 + tileHeight, i],
                 scale: [0.15, 0.15, 0.15],
@@ -162,6 +169,7 @@ export const Home: FC = () => {
                 isSelected: isSelected ? true : false,
                 canMoveHere: canMoveHere,
                 movingTo: isSelected && movingTo ? movingTo : null,
+                pieceIsBeingReplaced: pieceIsBeingReplaced ? true : false,
                 finishMovingPiece: () =>
                   finishMovingPiece(movingTo?.tile ?? null),
                 newTileHeight: newTileHeight,
