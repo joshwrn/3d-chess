@@ -12,16 +12,6 @@ import { motion } from 'framer-motion-3d'
 import type { MovingTo } from '../../pages'
 import type { Position } from '../logic/board'
 
-export type ModelProps = JSX.IntrinsicElements[`group`] & {
-  color: string
-  isSelected: boolean
-  canMoveHere: Position | null
-  movingTo: MovingTo | null
-  finishMovingPiece: () => void
-  newTileHeight: number
-  pieceIsBeingReplaced: boolean
-  wasSelected: boolean
-}
 export const PieceMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & { isSelected: boolean }
 > = ({ color, isSelected, ...props }) => (
@@ -40,6 +30,17 @@ export const PieceMaterial: FC<
     {...props}
   />
 )
+
+export type ModelProps = JSX.IntrinsicElements[`group`] & {
+  color: string
+  isSelected: boolean
+  canMoveHere: Position | null
+  movingTo: MovingTo | null
+  finishMovingPiece: () => void
+  newTileHeight: number
+  pieceIsBeingReplaced: boolean
+  wasSelected: boolean
+}
 
 export const MeshWrapper: FC<ModelProps> = ({
   movingTo,
