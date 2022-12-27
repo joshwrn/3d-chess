@@ -45,6 +45,10 @@ export const BoardComponent: FC = () => {
   const [moves, setMoves] = useState<Position[]>([])
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [turn, setTurn] = useState<Color>(`white`)
+  const [redLightPosition, setRedLightPosition] = useState<Position>({
+    x: 0,
+    y: 0,
+  })
 
   const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
@@ -58,6 +62,7 @@ export const BoardComponent: FC = () => {
     setMoves(movesForPiece(tile.piece, board))
     setSelected(tile)
     setLastSelected(tile)
+    setRedLightPosition(tile.position)
   }
 
   const finishMovingPiece = (tile: Tile | null) => {
@@ -110,11 +115,7 @@ export const BoardComponent: FC = () => {
       <animated.pointLight
         intensity={intensity}
         color="red"
-        position={[
-          lastSelected?.position.x ?? 0,
-          0,
-          lastSelected?.position.y ?? 0,
-        ]}
+        position={[redLightPosition.x, 0, redLightPosition.y]}
       />
 
       {board.map((row, i) => {
