@@ -101,7 +101,7 @@ export const createPiece = (
 export const moveTypes = {
   invalid: `invalid` as const,
   valid: `valid` as const,
-  check: `check` as const,
+  captureKing: `captureKing` as const,
   capture: `capture` as const,
 }
 export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
@@ -152,7 +152,7 @@ export const willBeInCheck = (
         board: newBoard,
         propagateWillBeCheck: false,
       })
-      if (moves.find((move) => move.type === `check`)) {
+      if (moves.find((move) => move.type === `captureKing`)) {
         isCheck = true
         return isCheck
       }
@@ -161,7 +161,7 @@ export const willBeInCheck = (
   return isCheck
 }
 
-export const checkPosition = ({
+export const classifyMoveType = ({
   piece,
   board,
   move,
@@ -182,7 +182,7 @@ export const checkPosition = ({
   if (propagateWillBeCheck && willBeInCheck(piece, board, move)) return `invalid`
   if (cur.piece) {
     if (cur.piece?.color === oppositeColor(piece.color)) {
-      return cur.piece.type === `king` ? `check` : `capture`
+      return cur.piece.type === `king` ? `captureKing` : `capture`
     }
     return `invalid`
   }
@@ -204,10 +204,10 @@ export const getFarMoves = ({
   for (let i = 1; i < 8; i++) {
     const getMove = (dir: Position) => ({ x: dir.x * i, y: dir.y * i })
     const move = getMove(dir)
-    const check = checkPosition({ piece, board, move, propagateWillBeCheck })
-    if (check === `invalid`) break
-    moves.push({ position: move, type: check })
-    if (check === `capture` || check === `check`) break
+    const type = classifyMoveType({ piece, board, move, propagateWillBeCheck })
+    if (type === `invalid`) break
+    moves.push({ position: move, type: type })
+    if (type === `capture` || type === `captureKing`) break
   }
   return moves
 }
