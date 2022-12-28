@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useSpring, animated } from '@react-spring/three'
 
@@ -8,6 +8,8 @@ import type { Position, Tile, Board } from '../logic/board'
 import { tileHeights, copyBoard } from '../logic/board'
 import type { Color, Move } from '../logic/pieces'
 import {
+  oppositeColor,
+  detectCheckmate,
   shouldPromotePawn,
   checkIfSelectedPieceCanMoveHere,
   movesForPiece,
@@ -76,12 +78,23 @@ export const BoardComponent: FC<{
       selectedTile.piece = null
       return [...newBoard]
     })
-    setTurn((prev) => (prev === `white` ? `black` : `white`))
+    setTurn((prev) => {
+      const next = oppositeColor(prev)
+      return next
+    })
+
     setMovingTo(null)
     setMoves([])
     setSelected(null)
     setLastSelected(null)
   }
+
+  useEffect(() => {
+    const checkmate = detectCheckmate(board, turn)
+    if (checkmate) {
+      alert(`${oppositeColor(turn)} wins!`)
+    }
+  }, [board, turn])
 
   const startMovingPiece = (
     e: ThreeMouseEvent,

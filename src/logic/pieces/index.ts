@@ -161,6 +161,24 @@ export const willBeInCheck = (
   return isCheck
 }
 
+export const detectCheckmate = (board: Board, turn: Color): boolean => {
+  let isCheckmate = true
+  for (const tile of board.flat()) {
+    if (tile.piece?.color === turn) {
+      const moves = movesForPiece({
+        piece: tile.piece,
+        board,
+        propagateDetectCheck: true,
+      })
+      if (moves.find((move) => move.type !== `invalid`)) {
+        isCheckmate = false
+        break
+      }
+    }
+  }
+  return isCheckmate
+}
+
 export const classifyMoveType = ({
   piece,
   board,

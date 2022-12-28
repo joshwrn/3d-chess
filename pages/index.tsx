@@ -7,7 +7,7 @@ import { Canvas } from '@react-three/fiber'
 
 import { BoardComponent } from '../src/components/Board'
 import type { Board, Position, Tile } from '../src/logic/board'
-import { DEFAULT_BOARD } from '../src/logic/board'
+import { TEST_BOARD } from '../src/logic/board'
 import type { Move } from '../src/logic/pieces'
 import { Border } from '../src/models/Border'
 
@@ -20,7 +20,7 @@ export type MovingTo = {
 }
 
 export const Home: FC = () => {
-  const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
+  const [board, setBoard] = useState<Board>(TEST_BOARD)
   const [selected, setSelected] = useState<Tile | null>(null)
   const [moves, setMoves] = useState<Move[]>([])
   return (
