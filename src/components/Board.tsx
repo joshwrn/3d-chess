@@ -49,7 +49,7 @@ export const BoardComponent: FC<{
 
     setMovingTo(null)
     setMoves(
-      movesForPiece({ piece: tile.piece, board, propagateWillBeCheck: true }),
+      movesForPiece({ piece: tile.piece, board, propagateDetectCheck: true }),
     )
     setSelected(tile)
     setLastSelected(tile)

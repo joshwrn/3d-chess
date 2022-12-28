@@ -9,7 +9,7 @@ export function isPawn(value: Pawn | Piece | null): value is Pawn {
 export const pawnMoves: MoveFunction<Pawn> = ({
   piece,
   board,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }) => {
   const { firstMove, color } = piece
   const colorMultiplier = color === `white` ? -1 : 1
@@ -21,7 +21,7 @@ export const pawnMoves: MoveFunction<Pawn> = ({
     movesForward.push({ x: 0, y: 2 * colorMultiplier })
   }
   for (const move of movesForward) {
-    const type = classifyMoveType({ piece, board, move, propagateWillBeCheck })
+    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type !== `invalid` && type !== `capture` && type !== `captureKing`) {
       moves.push({ position: move, type: type })
     }
@@ -32,7 +32,7 @@ export const pawnMoves: MoveFunction<Pawn> = ({
     { x: -1, y: 1 * colorMultiplier },
   ]
   for (const move of movesDiagonal) {
-    const type = classifyMoveType({ piece, board, move, propagateWillBeCheck })
+    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type === `capture` || type === `captureKing`) {
       moves.push({ position: move, type: type })
     }

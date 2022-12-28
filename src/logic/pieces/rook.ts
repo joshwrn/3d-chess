@@ -8,9 +8,9 @@ export function isRook(value: Piece | Rook | null): value is Rook {
 export const rookMoves: MoveFunction = ({
   piece,
   board,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }) => {
-  const props = { piece, board, propagateWillBeCheck }
+  const props = { piece, board, propagateDetectCheck }
   const movesForward = getFarMoves({ dir: { x: 0, y: 1 }, ...props })
   const movesBackward = getFarMoves({ dir: { x: 0, y: -1 }, ...props })
   const movesLeft = getFarMoves({ dir: { x: -1, y: 0 }, ...props })

@@ -25,19 +25,19 @@ export const oppositeColor = (color: Color): Color => {
 export const movesForPiece = ({
   piece,
   board,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }: {
   piece: Pawn | Piece | null
   board: Board
-  propagateWillBeCheck: boolean
+  propagateDetectCheck: boolean
 }): Move[] => {
   if (!piece) return []
-  const props = { piece, board, propagateWillBeCheck }
+  const props = { piece, board, propagateDetectCheck }
   if (isPawn(piece)) {
     return pawnMoves({ ...props } as {
       piece: Pawn
       board: Board
-      propagateWillBeCheck: boolean
+      propagateDetectCheck: boolean
     })
   }
   if (isRook(piece)) {
@@ -112,7 +112,7 @@ export type Move = {
 export type MoveFunction<T extends Piece = Piece> = (props: {
   piece: T
   board: Board
-  propagateWillBeCheck: boolean
+  propagateDetectCheck: boolean
 }) => Move[]
 
 export const willBeInCheck = (
@@ -150,7 +150,7 @@ export const willBeInCheck = (
       const moves = movesForPiece({
         piece: tile.piece,
         board: newBoard,
-        propagateWillBeCheck: false,
+        propagateDetectCheck: false,
       })
       if (moves.find((move) => move.type === `captureKing`)) {
         isCheck = true
@@ -165,12 +165,12 @@ export const classifyMoveType = ({
   piece,
   board,
   move,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }: {
   piece: Piece
   board: Board
   move: Position
-  propagateWillBeCheck: boolean
+  propagateDetectCheck: boolean
 }): MoveTypes => {
   const { position } = piece
   const { x, y } = move
@@ -179,7 +179,7 @@ export const classifyMoveType = ({
   if (!row) return `invalid`
   const cur = row[nextPosition.x]
   if (!cur) return `invalid`
-  if (propagateWillBeCheck && willBeInCheck(piece, board, move)) return `invalid`
+  if (propagateDetectCheck && willBeInCheck(piece, board, move)) return `invalid`
   if (cur.piece) {
     if (cur.piece?.color === oppositeColor(piece.color)) {
       return cur.piece.type === `king` ? `captureKing` : `capture`
@@ -193,18 +193,18 @@ export const getFarMoves = ({
   dir,
   piece,
   board,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }: {
   dir: Position
   piece: Piece
   board: Board
-  propagateWillBeCheck: boolean
+  propagateDetectCheck: boolean
 }): Move[] => {
   const moves: Move[] = []
   for (let i = 1; i < 8; i++) {
     const getMove = (dir: Position) => ({ x: dir.x * i, y: dir.y * i })
     const move = getMove(dir)
-    const type = classifyMoveType({ piece, board, move, propagateWillBeCheck })
+    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type === `invalid`) break
     moves.push({ position: move, type: type })
     if (type === `capture` || type === `captureKing`) break

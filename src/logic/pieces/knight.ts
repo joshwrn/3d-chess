@@ -9,11 +9,11 @@ export function isKnight(value: Knight | Piece | null): value is Knight {
 export const knightMoves: MoveFunction = ({
   piece,
   board,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }) => {
   const moves = []
   for (const move of KNIGHT_MOVES) {
-    const type = classifyMoveType({ piece, board, move, propagateWillBeCheck })
+    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type === `invalid`) continue
     moves.push({ position: move, type: type })
   }

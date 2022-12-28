@@ -8,9 +8,9 @@ export function isBishop(value: Bishop | Piece | null): value is Bishop {
 export const bishopMoves: MoveFunction = ({
   piece,
   board,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }) => {
-  const props = { piece, board, propagateWillBeCheck }
+  const props = { piece, board, propagateDetectCheck }
   const moveRightDown = getFarMoves({ dir: { x: 1, y: 1 }, ...props })
   const moveLeftUp = getFarMoves({ dir: { x: -1, y: -1 }, ...props })
   const moveLeftDown = getFarMoves({ dir: { x: -1, y: 1 }, ...props })

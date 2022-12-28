@@ -9,12 +9,12 @@ export function isKing(value: King | Piece | null): value is King {
 export const kingMoves: MoveFunction = ({
   piece,
   board,
-  propagateWillBeCheck,
+  propagateDetectCheck,
 }) => {
   const moves = []
 
   for (const move of KING_MOVES) {
-    const type = classifyMoveType({ piece, board, move, propagateWillBeCheck })
+    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type === `invalid`) continue
     moves.push({ position: move, type: type })
   }
