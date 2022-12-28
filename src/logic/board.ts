@@ -17,6 +17,24 @@ export const createTile = (position: Position, piece?: PieceArgs): Tile => {
   }
 }
 
+export const tileHeights: number[] = Array(64)
+  .fill(0)
+  .map(() => {
+    return Math.random() * 0.05
+  })
+
+export const copyBoard = (board: Board): Board => {
+  return [
+    ...board.map((row) => {
+      return [
+        ...row.map((tile) => {
+          return { ...tile }
+        }),
+      ]
+    }),
+  ]
+}
+
 export const DEFAULT_BOARD: Board = [
   [
     createTile(

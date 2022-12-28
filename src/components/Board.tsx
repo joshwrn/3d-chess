@@ -5,6 +5,7 @@ import { useSpring, animated } from '@react-spring/three'
 
 import type { MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
+import { tileHeights, copyBoard } from '../logic/board'
 import type { Color } from '../logic/pieces'
 import {
   shouldPromotePawn,
@@ -21,24 +22,6 @@ import { PawnModel } from '../models/Pawn'
 import { QueenComponent } from '../models/Queen'
 import { RookComponent } from '../models/Rook'
 import { TileComponent } from '../models/Tile'
-
-const tileHeights = Array(64)
-  .fill(0)
-  .map(() => {
-    return Math.random() * 0.05
-  })
-
-const copyBoard = (board: Board): Board => {
-  return [
-    ...board.map((row) => {
-      return [
-        ...row.map((tile) => {
-          return { ...tile }
-        }),
-      ]
-    }),
-  ]
-}
 
 export const BoardComponent: FC<{
   selected: Tile | null
