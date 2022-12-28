@@ -34,8 +34,9 @@ export const pawnMoves: MoveFunction<Pawn> = ({
 
   for (const move of movesDiagonal) {
     const check = checkPosition({ piece, board, move, propagateWillBeCheck })
-    if (check !== `capture`) continue
-    moves.push({ position: move, type: check })
+    if (check === `capture` || check === `check`) {
+      moves.push({ position: move, type: check })
+    }
   }
 
   return moves
