@@ -22,7 +22,7 @@ export const Border: FC = () => {
     <mesh
       onClick={(e) => e.stopPropagation()}
       receiveShadow
-      position={[-0.5, -0.255, -0.5]}
+      position={[-0.5, -0.35, -0.5]}
       rotation={[0, 0, 0]}
     >
       <boxBufferGeometry attach="geometry" args={[9, 0.5, 9]} />

@@ -17,14 +17,12 @@ export const PieceMaterial: FC<
 > = ({ color, isSelected, ...props }) => (
   <meshPhysicalMaterial
     reflectivity={4}
-    color={color === `white` ? `#d9d9d9` : `#5a5a5a`}
-    emissive={isSelected ? `#733535` : color === `white` ? `#000000` : `#0c0c0c`}
+    color={color === `white` ? `#d9d9d9` : `#7c7c7c`}
+    emissive={isSelected ? `#733535` : color === `white` ? `#000000` : `#000000`}
     metalness={1}
     roughness={0.5}
     attach="material"
     envMapIntensity={0.2}
-    clearcoat={1}
-    clearcoatRoughness={0.1}
     opacity={1}
     transparent={true}
     {...props}
@@ -37,7 +35,6 @@ export type ModelProps = JSX.IntrinsicElements[`group`] & {
   canMoveHere: Position | null
   movingTo: MovingTo | null
   finishMovingPiece: () => void
-  newTileHeight: number
   pieceIsBeingReplaced: boolean
   wasSelected: boolean
 }
@@ -45,7 +42,6 @@ export type ModelProps = JSX.IntrinsicElements[`group`] & {
 export const MeshWrapper: FC<ModelProps> = ({
   movingTo,
   finishMovingPiece,
-  newTileHeight,
   isSelected,
   children,
   pieceIsBeingReplaced,
@@ -64,12 +60,12 @@ export const MeshWrapper: FC<ModelProps> = ({
         initial={false}
         animate={
           movingTo
-            ? variants.move({ movingTo, newTileHeight, isSelected })
+            ? variants.move({ movingTo, isSelected })
             : pieceIsBeingReplaced
-            ? variants.replace({ movingTo, newTileHeight, isSelected })
+            ? variants.replace({ movingTo, isSelected })
             : isSelected
-            ? variants.select({ movingTo, newTileHeight, isSelected })
-            : variants.initial({ movingTo, newTileHeight, isSelected })
+            ? variants.select({ movingTo, isSelected })
+            : variants.initial({ movingTo, isSelected })
         }
         transition={
           movingTo
@@ -137,7 +133,6 @@ export type VariantReturns =
 export type VariantProps = {
   isSelected: boolean
   movingTo: MovingTo | null
-  newTileHeight: number
 }
 
 type VariantFunction = (props: VariantProps) => VariantReturns
@@ -155,9 +150,9 @@ export const variants: {
     y: isSelected ? 1.4 : 0,
     z: 0,
   }),
-  move: ({ movingTo, newTileHeight }: VariantProps) => ({
+  move: ({ movingTo }: VariantProps) => ({
     x: getDistance(movingTo?.move.x),
-    y: [1.4, 1.6, getDistance(newTileHeight)],
+    y: [1.4, 1.6, 0],
     z: getDistance(movingTo?.move.y),
   }),
   replace: () => ({

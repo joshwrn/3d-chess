@@ -5,7 +5,7 @@ import { useSpring, animated } from '@react-spring/three'
 
 import type { MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
-import { tileHeights, copyBoard } from '../logic/board'
+import { copyBoard } from '../logic/board'
 import type { Color, Move } from '../logic/pieces'
 import {
   oppositeColor,
@@ -121,20 +121,24 @@ export const BoardComponent: FC<{
 
   return (
     <group position={[-4, -0.5, -4]}>
+      {/* <mesh position={[3.5, 5, 3.5]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="#d886b7" />
+      </mesh> */}
       <pointLight
         shadow-mapSize={[2048, 2048]}
         castShadow
-        position={[0, 10, 0]}
-        intensity={0.35}
-        color="#ffbdd6"
+        position={[3.5, 10, 3.5]}
+        intensity={0.65}
+        color="#ffe0ec"
       />
+      <hemisphereLight intensity={0.5} color="#ffa4a4" groundColor="#d886b7" />
       {/* @ts-ignore */}
       <animated.pointLight
         intensity={intensity}
         color="red"
         position={[redLightPosition.x, 0, redLightPosition.y]}
       />
-
       {board.map((row, i) => {
         return row.map((tile, j) => {
           const bg = `${(i + j) % 2 === 0 ? `white` : `black`}`
@@ -146,13 +150,6 @@ export const BoardComponent: FC<{
             moves,
             selected,
           })
-          const tileHeight = tileHeights[j * i]
-          const tileToMoveToHeight =
-            tileHeights[
-              (movingTo?.tile?.position.y ?? 0) *
-                (movingTo?.tile?.position.x ?? 0)
-            ]
-          const newTileHeight = tileToMoveToHeight - tileHeight
 
           const movingToId = movingTo?.tile?.piece?.getId()
           const tileId = tile.piece?.getId()
@@ -169,7 +166,7 @@ export const BoardComponent: FC<{
           }
 
           const props: ModelProps = {
-            position: [j, 0.5 + tileHeight, i],
+            position: [j, 0.5, i],
             scale: [0.15, 0.15, 0.15],
             color: tile.piece?.color || `white`,
             onClick: handleClick,
@@ -181,7 +178,6 @@ export const BoardComponent: FC<{
             movingTo: isSelected && movingTo ? movingTo : null,
             pieceIsBeingReplaced: pieceIsBeingReplaced ? true : false,
             finishMovingPiece: () => finishMovingPiece(movingTo?.tile ?? null),
-            newTileHeight: newTileHeight,
           }
 
           const pieceId = tile.piece?.getId() ?? `empty-${j}-${i}`
@@ -190,7 +186,7 @@ export const BoardComponent: FC<{
             <group key={`${j}-${i}`}>
               <TileComponent
                 color={bg}
-                position={[j, 0.25 + tileHeight, i]}
+                position={[j, 0.25, i]}
                 onClick={handleClick}
                 canMoveHere={canMoveHere}
                 isSelected={isSelected ? true : false}

@@ -170,6 +170,7 @@ export const detectCheckmate = (board: Board, turn: Color): boolean => {
         board,
         propagateDetectCheck: true,
       })
+      // if no move is capture king then its stalemate
       if (moves.find((move) => move.type !== `invalid`)) {
         isCheckmate = false
         break

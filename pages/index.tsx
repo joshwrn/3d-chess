@@ -39,7 +39,7 @@ export const Home: FC = () => {
         height: 100vh;
         width: 100vw;
         background-color: #000;
-        background: linear-gradient(180deg, #1b1b1b, #111);
+        background: linear-gradient(180deg, #000000, #242424);
         display: flex;
         justify-content: center;
         align-items: center;
