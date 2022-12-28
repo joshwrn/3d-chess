@@ -1,22 +1,20 @@
-import type { Board, Position } from '../board'
-import type { Piece, PieceFactory } from './'
+import type { MoveFunction, Piece, PieceFactory } from './'
 import { getFarMoves, getBasePiece } from './'
 
 export function isRook(value: Piece | Rook | null): value is Rook {
   return value?.type === `rook`
 }
 
-export const rookMoves = ({
+export const rookMoves: MoveFunction = ({
   piece,
   board,
-}: {
-  piece: Rook
-  board: Board
-}): Position[] => {
-  const movesForward = getFarMoves({ dir: { x: 0, y: 1 }, piece, board })
-  const movesBackward = getFarMoves({ dir: { x: 0, y: -1 }, piece, board })
-  const movesLeft = getFarMoves({ dir: { x: -1, y: 0 }, piece, board })
-  const movesRight = getFarMoves({ dir: { x: 1, y: 0 }, piece, board })
+  propagateWillBeCheck,
+}) => {
+  const props = { piece, board, propagateWillBeCheck }
+  const movesForward = getFarMoves({ dir: { x: 0, y: 1 }, ...props })
+  const movesBackward = getFarMoves({ dir: { x: 0, y: -1 }, ...props })
+  const movesLeft = getFarMoves({ dir: { x: -1, y: 0 }, ...props })
+  const movesRight = getFarMoves({ dir: { x: 1, y: 0 }, ...props })
   return [...movesForward, ...movesBackward, ...movesLeft, ...movesRight]
 }
 

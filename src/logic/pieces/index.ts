@@ -22,28 +22,38 @@ export const oppositeColor = (color: Color): Color => {
   return color === `black` ? `white` : `black`
 }
 
-export const movesForPiece = (
-  piece: Pawn | Piece | null,
-  board: Board,
-): Position[] => {
+export const movesForPiece = ({
+  piece,
+  board,
+  propagateWillBeCheck,
+}: {
+  piece: Pawn | Piece | null
+  board: Board
+  propagateWillBeCheck: boolean
+}): Move[] => {
   if (!piece) return []
+  const props = { piece, board, propagateWillBeCheck }
   if (isPawn(piece)) {
-    return pawnMoves({ piece, board })
+    return pawnMoves({ ...props } as {
+      piece: Pawn
+      board: Board
+      propagateWillBeCheck: boolean
+    })
   }
   if (isRook(piece)) {
-    return rookMoves({ piece, board })
+    return rookMoves(props)
   }
   if (isKnight(piece)) {
-    return knightMoves({ piece, board })
+    return knightMoves(props)
   }
   if (isBishop(piece)) {
-    return bishopMoves({ piece, board })
+    return bishopMoves(props)
   }
   if (isQueen(piece)) {
-    return queenMoves({ piece, board })
+    return queenMoves(props)
   }
   if (isKing(piece)) {
-    return kingMoves({ piece, board })
+    return kingMoves(props)
   }
   return []
 }
@@ -88,23 +98,91 @@ export const createPiece = (
   }
 }
 
-export type MoveTypes = `capture` | `invalid` | `valid`
+export const moveTypes = {
+  invalid: `invalid` as const,
+  valid: `valid` as const,
+  check: `check` as const,
+  capture: `capture` as const,
+}
+export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
+export type Move = {
+  position: Position
+  type: MoveTypes
+}
+export type MoveFunction<T extends Piece = Piece> = (props: {
+  piece: T
+  board: Board
+  propagateWillBeCheck: boolean
+}) => Move[]
 
-export const checkPosition = (
+export const willBeInCheck = (
   piece: Piece,
   board: Board,
-  move: Position,
-): MoveTypes => {
+  move: Move,
+): boolean => {
+  let isCheck = false
+  const newBoard = board.map((row) =>
+    row.map((tile) => {
+      if (
+        tile.position.x === piece.position.x &&
+        tile.position.y === piece.position.y
+      ) {
+        return {
+          ...tile,
+          piece: null,
+        }
+      }
+      if (
+        tile.position.x === move.position.x + piece.position.x &&
+        tile.position.y === move.position.y + piece.position.y
+      ) {
+        return {
+          ...tile,
+          piece,
+        }
+      }
+      return tile
+    }),
+  )
+
+  for (const tile of newBoard.flat()) {
+    if (tile.piece?.color === oppositeColor(piece.color)) {
+      const moves = movesForPiece({
+        piece: tile.piece,
+        board: newBoard,
+        propagateWillBeCheck: false,
+      })
+      if (moves.find((move) => move.type === `check`)) {
+        isCheck = true
+        return isCheck
+      }
+    }
+  }
+  return isCheck
+}
+
+export const checkPosition = ({
+  piece,
+  board,
+  move,
+  propagateWillBeCheck,
+}: {
+  piece: Piece
+  board: Board
+  move: Move
+  propagateWillBeCheck: boolean
+}): MoveTypes => {
   const { position } = piece
-  const { x, y } = move
+  const { x, y } = move.position
   const nextPosition = { x: position.x + x, y: position.y + y }
   const row = board[nextPosition.y]
   if (!row) return `invalid`
   const cur = row[nextPosition.x]
   if (!cur) return `invalid`
+  if (propagateWillBeCheck && willBeInCheck(piece, board, move)) return `invalid`
   if (cur.piece) {
     if (cur.piece?.color === oppositeColor(piece.color)) {
-      return `capture`
+      return cur.piece.type === `king` ? `check` : `capture`
     }
     return `invalid`
   }
@@ -115,19 +193,24 @@ export const getFarMoves = ({
   dir,
   piece,
   board,
+  propagateWillBeCheck,
 }: {
   dir: Position
   piece: Piece
   board: Board
-}): Position[] => {
-  const moves: Position[] = []
+  propagateWillBeCheck: boolean
+}): Move[] => {
+  const moves: Move[] = []
   for (let i = 1; i < 8; i++) {
-    const getMove = (dir: Position) => ({ x: dir.x * i, y: dir.y * i })
-    const move = getMove(dir)
-    const check = checkPosition(piece, board, move)
+    const getMove = (dir: Position) => ({
+      position: { x: dir.x * i, y: dir.y * i },
+      type: `invalid`,
+    })
+    const move = getMove(dir) as Move
+    const check = checkPosition({ piece, board, move, propagateWillBeCheck })
     if (check === `invalid`) break
-    moves.push(move)
-    if (check === `capture`) break
+    moves.push({ ...move, type: check })
+    if (check === `capture` || check === `check`) break
   }
   return moves
 }
@@ -149,7 +232,7 @@ export const checkIfSelectedPieceCanMoveHere = ({
   tile,
 }: {
   selected: Tile | null
-  moves: Position[]
+  moves: Move[]
   tile: Tile
 }): Position | null => {
   if (!selected?.piece) return null
@@ -160,10 +243,10 @@ export const checkIfSelectedPieceCanMoveHere = ({
     const pos = selected.position || { x: 0, y: 0 }
 
     if (
-      pos.x + move.x === tile.position.x &&
-      pos.y + move.y === tile.position.y
+      pos.x + move.position.x === tile.position.x &&
+      pos.y + move.position.y === tile.position.y
     ) {
-      theMove = move
+      theMove = move.position
       break
     }
   }

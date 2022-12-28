@@ -6,7 +6,7 @@ import { useSpring, animated } from '@react-spring/three'
 import type { MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
 import { tileHeights, copyBoard } from '../logic/board'
-import type { Color } from '../logic/pieces'
+import type { Color, Move } from '../logic/pieces'
 import {
   shouldPromotePawn,
   checkIfSelectedPieceCanMoveHere,
@@ -28,8 +28,8 @@ export const BoardComponent: FC<{
   setSelected: (tile: Tile | null) => void
   board: Board
   setBoard: React.Dispatch<React.SetStateAction<Board>>
-  moves: Position[]
-  setMoves: (moves: Position[]) => void
+  moves: Move[]
+  setMoves: (moves: Move[]) => void
 }> = ({ selected, setSelected, board, setBoard, moves, setMoves }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
@@ -48,7 +48,9 @@ export const BoardComponent: FC<{
     }
 
     setMovingTo(null)
-    setMoves(movesForPiece(tile.piece, board))
+    setMoves(
+      movesForPiece({ piece: tile.piece, board, propagateWillBeCheck: true }),
+    )
     setSelected(tile)
     setLastSelected(tile)
     setRedLightPosition(tile.position)

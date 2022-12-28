@@ -6,9 +6,9 @@ import { Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 
 import { BoardComponent } from '../src/components/Board'
-import { MiniMap } from '../src/components/MiniMap'
 import type { Board, Position, Tile } from '../src/logic/board'
 import { DEFAULT_BOARD } from '../src/logic/board'
+import type { Move } from '../src/logic/pieces'
 import { Border } from '../src/models/Border'
 
 export type ThreeMouseEvent = {
@@ -22,7 +22,7 @@ export type MovingTo = {
 export const Home: FC = () => {
   const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
   const [selected, setSelected] = useState<Tile | null>(null)
-  const [moves, setMoves] = useState<Position[]>([])
+  const [moves, setMoves] = useState<Move[]>([])
   return (
     <div
       css={css`
@@ -36,7 +36,7 @@ export const Home: FC = () => {
         flex-direction: column;
       `}
     >
-      <MiniMap board={board} selected={selected} moves={moves} />
+      {/* <MiniMap board={board} selected={selected} moves={moves} /> */}
       <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
         <OrbitControls enableZoom={true} />
         <Environment preset="dawn" />

@@ -1,53 +1,76 @@
-import type { Board, Position } from '../board'
-import type { Piece, PieceFactory } from './'
+import type { Move, MoveFunction, Piece, PieceFactory } from './'
 import { checkPosition, getBasePiece } from './'
 
 export function isKnight(value: Knight | Piece | null): value is Knight {
   return value?.type === `knight`
 }
 
-export const knightMoves = ({
+export const knightMoves: MoveFunction = ({
   piece,
   board,
-}: {
-  piece: Knight
-  board: Board
-}): Position[] => {
-  const moves: Position[] = [
+  propagateWillBeCheck,
+}) => {
+  const allMoves: Move[] = [
     {
-      x: 1,
-      y: 2,
+      type: `invalid`,
+      position: {
+        x: 1,
+        y: 2,
+      },
     },
     {
-      x: 2,
-      y: 1,
+      type: `invalid`,
+      position: {
+        x: 2,
+        y: 1,
+      },
     },
     {
-      x: 2,
-      y: -1,
+      type: `invalid`,
+      position: {
+        x: 2,
+        y: -1,
+      },
     },
     {
-      x: 1,
-      y: -2,
+      type: `invalid`,
+      position: {
+        x: 1,
+        y: -2,
+      },
     },
     {
-      x: -1,
-      y: -2,
+      type: `invalid`,
+      position: {
+        x: -1,
+        y: -2,
+      },
     },
     {
-      x: -2,
-      y: -1,
+      type: `invalid`,
+      position: {
+        x: -2,
+        y: -1,
+      },
     },
     {
-      x: -2,
-      y: 1,
+      type: `invalid`,
+      position: {
+        x: -2,
+        y: 1,
+      },
     },
     {
-      x: -1,
-      y: 2,
+      type: `invalid`,
+      position: {
+        x: -1,
+        y: 2,
+      },
     },
-  ].filter((move) => {
-    const check = checkPosition(piece, board, move)
+  ]
+
+  const moves = allMoves.filter((move) => {
+    const check = checkPosition({ piece, board, move, propagateWillBeCheck })
     if (check === `invalid`) return false
     return true
   })
