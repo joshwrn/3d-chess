@@ -4,3 +4,13 @@
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
 }
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    padding: 5px;
+    display: flex;
+justify-content: center;
+border-radius: 4px;
+}

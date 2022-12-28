@@ -12,12 +12,13 @@ import {
   FaChessKing,
 } from 'react-icons/fa'
 
-import type { Board, Position, Tile } from '../logic/board'
+import type { Board, Tile } from '../logic/board'
+import type { Move } from '../logic/pieces'
 
 export const MiniMap: FC<{
   board: Board
   selected: Tile | null
-  moves: Position[]
+  moves: Move[]
 }> = ({ board, selected, moves }) => {
   const [show, setShow] = useState<boolean>(false)
   return (
@@ -27,7 +28,7 @@ export const MiniMap: FC<{
           position: absolute;
           top: 50px;
           left: 50px;
-          z-index: 2;
+          z-index: 1;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -50,15 +51,15 @@ export const MiniMap: FC<{
             position: absolute;
             flex-direction: column;
             top: 50px;
-            left: 150px;
+            left: 50px;
             z-index: 1;
             width: 200px;
             height: 200px;
             flex-shrink: 0;
             overflow: hidden;
             border-radius: 7px;
-            pointer-events: none;
           `}
+          onClick={() => setShow(!show)}
         >
           {board.map((row, i) => (
             <div
@@ -79,8 +80,8 @@ export const MiniMap: FC<{
                     const pos = selected.position || { x: 0, y: 0 }
 
                     if (
-                      pos.x + move.x === tile.position.x &&
-                      pos.y + move.y === tile.position.y
+                      pos.x + move.position.x === tile.position.x &&
+                      pos.y + move.position.y === tile.position.y
                     ) {
                       canMove = true
                       break

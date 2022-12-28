@@ -31,8 +31,18 @@ export const BoardComponent: FC<{
   board: Board
   setBoard: React.Dispatch<React.SetStateAction<Board>>
   moves: Move[]
+  checkmate: string
+  setCheckmate: (checkmate: string) => void
   setMoves: (moves: Move[]) => void
-}> = ({ selected, setSelected, board, setBoard, moves, setMoves }) => {
+}> = ({
+  selected,
+  setSelected,
+  board,
+  setBoard,
+  moves,
+  setMoves,
+  setCheckmate,
+}) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [turn, setTurn] = useState<Color>(`white`)
@@ -92,7 +102,7 @@ export const BoardComponent: FC<{
   useEffect(() => {
     const checkmate = detectCheckmate(board, turn)
     if (checkmate) {
-      alert(`${oppositeColor(turn)} wins!`)
+      setCheckmate(oppositeColor(turn))
     }
   }, [board, turn])
 
