@@ -136,6 +136,13 @@ export const createId = (piece: PieceArgs | null): string => {
   return `${piece?.type}-${piece?.color}-${piece?.id}`
 }
 
+export const shouldPromotePawn = ({ tile }: { tile: Tile }): boolean => {
+  if (tile.position.y === 0 || tile.position.y === 7) {
+    return true
+  }
+  return false
+}
+
 export const checkIfSelectedPieceCanMoveHere = ({
   selected,
   moves,

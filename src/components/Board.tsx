@@ -6,7 +6,11 @@ import { useSpring, animated } from '@react-spring/three'
 import type { MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
 import type { Color } from '../logic/pieces'
-import { checkIfSelectedPieceCanMoveHere, movesForPiece } from '../logic/pieces'
+import {
+  shouldPromotePawn,
+  checkIfSelectedPieceCanMoveHere,
+  movesForPiece,
+} from '../logic/pieces'
 import { isPawn } from '../logic/pieces/pawn'
 import type { ModelProps } from '../models'
 import { MeshWrapper } from '../models'
@@ -76,6 +80,9 @@ export const BoardComponent: FC<{
       const tileToMoveTo = newBoard[tile.position.y][tile.position.x]
       if (isPawn(selectedTile.piece)) {
         selectedTile.piece.firstMove = false
+        if (shouldPromotePawn({ tile })) {
+          selectedTile.piece.type = `queen`
+        }
       }
 
       tileToMoveTo.piece = selected.piece
