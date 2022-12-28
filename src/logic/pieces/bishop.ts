@@ -10,30 +10,11 @@ export const bishopMoves: MoveFunction = ({
   board,
   propagateWillBeCheck,
 }) => {
-  const moveRightDown = getFarMoves({
-    dir: { x: 1, y: 1 },
-    piece,
-    board,
-    propagateWillBeCheck,
-  })
-  const moveLeftUp = getFarMoves({
-    dir: { x: -1, y: -1 },
-    piece,
-    board,
-    propagateWillBeCheck,
-  })
-  const moveLeftDown = getFarMoves({
-    dir: { x: -1, y: 1 },
-    piece,
-    board,
-    propagateWillBeCheck,
-  })
-  const moveRightUp = getFarMoves({
-    dir: { x: 1, y: -1 },
-    piece,
-    board,
-    propagateWillBeCheck,
-  })
+  const props = { piece, board, propagateWillBeCheck }
+  const moveRightDown = getFarMoves({ dir: { x: 1, y: 1 }, ...props })
+  const moveLeftUp = getFarMoves({ dir: { x: -1, y: -1 }, ...props })
+  const moveLeftDown = getFarMoves({ dir: { x: -1, y: 1 }, ...props })
+  const moveRightUp = getFarMoves({ dir: { x: 1, y: -1 }, ...props })
   return [...moveRightDown, ...moveLeftUp, ...moveLeftDown, ...moveRightUp]
 }
 

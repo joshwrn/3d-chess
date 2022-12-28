@@ -1,4 +1,5 @@
-import type { Move, MoveFunction, Piece, PieceFactory } from './'
+import type { Position } from '../board'
+import type { MoveFunction, Piece, PieceFactory } from './'
 import { checkPosition, getBasePiece } from './'
 
 export function isKing(value: King | Piece | null): value is King {
@@ -10,70 +11,13 @@ export const kingMoves: MoveFunction = ({
   board,
   propagateWillBeCheck,
 }) => {
-  const allMoves: Move[] = [
-    {
-      type: `invalid`,
-      position: {
-        x: 0,
-        y: -1,
-      },
-    },
-    {
-      type: `invalid`,
-      position: {
-        x: 0,
-        y: 1,
-      },
-    },
-    {
-      type: `invalid`,
-      position: {
-        x: -1,
-        y: 0,
-      },
-    },
-    {
-      type: `invalid`,
-      position: {
-        x: 1,
-        y: 0,
-      },
-    },
-    {
-      type: `invalid`,
-      position: {
-        x: -1,
-        y: -1,
-      },
-    },
-    {
-      type: `invalid`,
-      position: {
-        x: 1,
-        y: 1,
-      },
-    },
-    {
-      type: `invalid`,
-      position: {
-        x: -1,
-        y: 1,
-      },
-    },
-    {
-      type: `invalid`,
-      position: {
-        x: 1,
-        y: -1,
-      },
-    },
-  ]
+  const moves = []
 
-  const moves = allMoves.filter((move) => {
+  for (const move of KING_MOVES) {
     const check = checkPosition({ piece, board, move, propagateWillBeCheck })
-    if (check === `invalid`) return false
-    return true
-  })
+    if (check === `invalid`) continue
+    moves.push({ position: move, type: check })
+  }
 
   return moves
 }
@@ -83,5 +27,40 @@ export const createKing = ({ color, id, position }: PieceFactory): King => {
     ...getBasePiece({ color, id, type: `king`, position }),
   }
 }
+
+const KING_MOVES: Position[] = [
+  {
+    x: 0,
+    y: -1,
+  },
+  {
+    x: 0,
+    y: 1,
+  },
+  {
+    x: -1,
+    y: 0,
+  },
+  {
+    x: 1,
+    y: 0,
+  },
+  {
+    x: -1,
+    y: -1,
+  },
+  {
+    x: 1,
+    y: 1,
+  },
+  {
+    x: -1,
+    y: 1,
+  },
+  {
+    x: 1,
+    y: -1,
+  },
+]
 
 export type King = Piece
