@@ -83,7 +83,12 @@ export const Home: FC = () => {
         </div>
       )}
       <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
-        <OrbitControls enabled={checkmate === ``} enableZoom={true} />
+        <OrbitControls
+          maxDistance={25}
+          minDistance={7}
+          enabled={checkmate === ``}
+          enableZoom={true}
+        />
         <Environment preset="dawn" />
         <Border />
         <BoardComponent
