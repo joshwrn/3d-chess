@@ -116,7 +116,7 @@ export const BoardComponent: FC<{
   }
 
   const { intensity } = useSpring({
-    intensity: selected ? 0.15 : 0,
+    intensity: selected ? 0.35 : 0,
   })
 
   return (
