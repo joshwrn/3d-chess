@@ -152,7 +152,7 @@ export const BoardComponent: FC<{
       <animated.pointLight
         intensity={intensity}
         color="red"
-        position={[redLightPosition.x, 0, redLightPosition.y]}
+        position={[redLightPosition.x, 1, redLightPosition.y]}
       />
       {board.map((row, i) => {
         return row.map((tile, j) => {
