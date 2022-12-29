@@ -161,8 +161,12 @@ export const willBeInCheck = (
   return isCheck
 }
 
-export const detectCheckmate = (board: Board, turn: Color): boolean => {
-  let isCheckmate = true
+export type GameOverType = `checkmate` | `stalemate`
+
+export const detectStalemate = (
+  board: Board,
+  turn: Color,
+): GameOverType | null => {
   for (const tile of board.flat()) {
     if (tile.piece?.color === turn) {
       const moves = movesForPiece({
@@ -170,14 +174,47 @@ export const detectCheckmate = (board: Board, turn: Color): boolean => {
         board,
         propagateDetectCheck: true,
       })
-      // if no move is capture king then its stalemate
       if (moves.find((move) => move.type !== `invalid`)) {
-        isCheckmate = false
-        break
+        return null
       }
     }
   }
-  return isCheckmate
+  return `stalemate`
+}
+
+export const detectCheckmate = (
+  board: Board,
+  turn: Color,
+): GameOverType | null => {
+  for (const tile of board.flat()) {
+    if (tile.piece?.color !== turn) {
+      const moves = movesForPiece({
+        piece: tile.piece,
+        board,
+        propagateDetectCheck: false,
+      })
+      if (moves.find((move) => move.type === `captureKing`)) {
+        return `checkmate`
+      }
+    }
+  }
+
+  return null
+}
+
+export const detectGameOver = (
+  board: Board,
+  turn: Color,
+): GameOverType | null => {
+  let gameOver = null
+  const staleMate = detectStalemate(board, turn)
+  if (staleMate) {
+    gameOver = staleMate
+    const checkMate = detectCheckmate(board, turn)
+    if (checkMate) gameOver = checkMate
+  }
+
+  return gameOver
 }
 
 export const classifyMoveType = ({

@@ -10,7 +10,7 @@ import { BoardComponent } from '../src/components/Board'
 import { MiniMap } from '../src/components/MiniMap'
 import type { Board, Position, Tile } from '../src/logic/board'
 import { DEFAULT_BOARD } from '../src/logic/board'
-import type { Move } from '../src/logic/pieces'
+import type { Color, GameOverType, Move } from '../src/logic/pieces'
 import { Border } from '../src/models/Border'
 
 export type ThreeMouseEvent = {
@@ -20,18 +20,22 @@ export type MovingTo = {
   move: Position
   tile: Tile
 }
+export type GameOver = {
+  type: GameOverType
+  winner: Color
+}
 
 export const Home: FC = () => {
   const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
   const [selected, setSelected] = useState<Tile | null>(null)
   const [moves, setMoves] = useState<Move[]>([])
-  const [checkmate, setCheckmate] = useState(``)
+  const [gameOver, setGameOver] = useState<GameOver | null>(null)
 
   const reset = () => {
     setBoard(DEFAULT_BOARD)
     setSelected(null)
     setMoves([])
-    setCheckmate(``)
+    setGameOver(null)
   }
   return (
     <div
@@ -47,7 +51,7 @@ export const Home: FC = () => {
       `}
     >
       <MiniMap board={board} selected={selected} moves={moves} />
-      {checkmate !== `` && (
+      {gameOver && (
         <div
           css={css`
             position: absolute;
@@ -76,7 +80,11 @@ export const Home: FC = () => {
             }
           `}
         >
-          <h1>{checkmate} wins!</h1>
+          <h1>
+            {gameOver.type === `checkmate`
+              ? `Checkmate! ${gameOver.winner} wins!`
+              : `Stalemate!`}
+          </h1>
           <button onClick={reset}>
             <VscDebugRestart />
           </button>
@@ -86,7 +94,7 @@ export const Home: FC = () => {
         <OrbitControls
           maxDistance={25}
           minDistance={7}
-          enabled={checkmate === ``}
+          enabled={!gameOver}
           enableZoom={true}
         />
         <Environment preset="dawn" />
@@ -98,8 +106,7 @@ export const Home: FC = () => {
           setBoard={setBoard}
           moves={moves}
           setMoves={setMoves}
-          checkmate={checkmate}
-          setCheckmate={setCheckmate}
+          setGameOver={setGameOver}
         />
       </Canvas>
     </div>

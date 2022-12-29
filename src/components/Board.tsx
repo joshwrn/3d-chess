@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react'
 
 import { useSpring, animated } from '@react-spring/three'
 
-import type { MovingTo, ThreeMouseEvent } from '../../pages'
+import type { GameOver, MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
 import { copyBoard } from '../logic/board'
 import type { Color, Move } from '../logic/pieces'
 import {
+  detectGameOver,
   oppositeColor,
-  detectCheckmate,
   shouldPromotePawn,
   checkIfSelectedPieceCanMoveHere,
   movesForPiece,
@@ -31,8 +31,7 @@ export const BoardComponent: FC<{
   board: Board
   setBoard: React.Dispatch<React.SetStateAction<Board>>
   moves: Move[]
-  checkmate: string
-  setCheckmate: (checkmate: string) => void
+  setGameOver: (gameOver: GameOver | null) => void
   setMoves: (moves: Move[]) => void
 }> = ({
   selected,
@@ -41,7 +40,7 @@ export const BoardComponent: FC<{
   setBoard,
   moves,
   setMoves,
-  setCheckmate,
+  setGameOver,
 }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
@@ -100,9 +99,9 @@ export const BoardComponent: FC<{
   }
 
   useEffect(() => {
-    const checkmate = detectCheckmate(board, turn)
-    if (checkmate) {
-      setCheckmate(oppositeColor(turn))
+    const gameOverType = detectGameOver(board, turn)
+    if (gameOverType) {
+      setGameOver({ type: gameOverType, winner: oppositeColor(turn) })
     }
   }, [board, turn])
 

@@ -24,6 +24,8 @@ export const pawnMoves: MoveFunction<Pawn> = ({
     const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type !== `invalid` && type !== `capture` && type !== `captureKing`) {
       moves.push({ position: move, type: type })
+    } else {
+      break
     }
   }
 
