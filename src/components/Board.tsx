@@ -95,18 +95,19 @@ export const BoardComponent: FC<{
       const selectedTile = newBoard[selected.position.y][selected.position.x]
       const tileToMoveTo = newBoard[tile.position.y][tile.position.x]
       if (isPawn(selectedTile.piece)) {
-        selectedTile.piece.firstMove = false
+        selectedTile.piece = { ...selectedTile.piece, firstMove: false }
         if (shouldPromotePawn({ tile })) {
           selectedTile.piece.type = `queen`
         }
       }
 
-      tileToMoveTo.piece = selected
-        ? Object.assign({}, { ...selected, position: tile.position })
+      tileToMoveTo.piece = selectedTile.piece
+        ? { ...selectedTile.piece, position: tile.position }
         : null
       selectedTile.piece = null
-      return [...newBoard]
+      return newBoard
     })
+
     setTurn((prev) => {
       const next = oppositeColor(prev)
       return next
