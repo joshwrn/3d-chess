@@ -108,7 +108,6 @@ export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
 export type Move = {
   position: Position
   type: MoveTypes
-  piece: Piece
 }
 export type MoveFunction<T extends Piece = Piece> = (props: {
   piece: T
@@ -263,7 +262,7 @@ export const getFarMoves = ({
     const move = getMove(dir)
     const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type === `invalid`) break
-    moves.push({ position: move, type: type, piece: piece })
+    moves.push({ position: move, type: type })
     if (type === `capture` || type === `captureKing`) break
   }
   return moves
