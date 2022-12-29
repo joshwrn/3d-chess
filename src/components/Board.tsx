@@ -35,6 +35,8 @@ export const BoardComponent: FC<{
   setGameOver: (gameOver: GameOver | null) => void
   setMoves: (moves: Move[]) => void
   setHistory: React.Dispatch<React.SetStateAction<History[]>>
+  turn: Color
+  setTurn: React.Dispatch<React.SetStateAction<Color>>
 }> = ({
   selected,
   setSelected,
@@ -44,10 +46,12 @@ export const BoardComponent: FC<{
   setMoves,
   setGameOver,
   setHistory,
+  turn,
+  setTurn,
 }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
-  const [turn, setTurn] = useState<Color>(`white`)
+
   const [redLightPosition, setRedLightPosition] = useState<Position>({
     x: 0,
     y: 0,

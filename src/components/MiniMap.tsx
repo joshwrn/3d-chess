@@ -1,5 +1,4 @@
 import type { FC } from 'react'
-import { useState } from 'react'
 
 import { css } from '@emotion/react'
 import {
@@ -19,7 +18,6 @@ export const MiniMap: FC<{
   selected: Piece | null
   moves: Move[]
 }> = ({ board, selected, moves }) => {
-  const [show, setShow] = useState<boolean>(false)
   return (
     <div
       css={css`
@@ -34,7 +32,6 @@ export const MiniMap: FC<{
         border-radius: 7px;
         opacity: 0.8;
       `}
-      onClick={() => setShow(!show)}
     >
       {board.map((row, i) => (
         <div

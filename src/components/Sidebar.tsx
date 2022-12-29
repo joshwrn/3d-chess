@@ -6,7 +6,7 @@ import { AiFillCloseCircle } from 'react-icons/ai'
 import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
 import type { Board } from '../logic/board'
-import type { Move, Piece } from '../logic/pieces'
+import type { Color, Move, Piece } from '../logic/pieces'
 import type { History } from './History'
 import { HistoryPanel } from './History'
 import { MiniMap } from './MiniMap'
@@ -16,8 +16,29 @@ export const Sidebar: FC<{
   history: History[]
   moves: Move[]
   selected: Piece | null
-}> = ({ board, history, moves, selected }) => {
+  setTurn: React.Dispatch<React.SetStateAction<Color>>
+  setBoard: (board: Board) => void
+  setHistory: React.Dispatch<React.SetStateAction<History[]>>
+  reset: () => void
+}> = ({
+  board,
+  history,
+  moves,
+  selected,
+  reset,
+  setBoard,
+  setHistory,
+  setTurn,
+}) => {
   const [show, setShow] = React.useState<boolean>(false)
+  const undo = () => {
+    if (history.length > 0) {
+      const last = history[history.length - 1]
+      setBoard(last.board)
+      setTurn((prev) => (prev === `white` ? `black` : `white`))
+      setHistory((prev) => prev.slice(0, prev.length - 1))
+    }
+  }
   return (
     <>
       {!show && (
@@ -65,6 +86,22 @@ export const Sidebar: FC<{
             <AiFillCloseCircle onClick={() => setShow(!show)} />
             <MiniMap board={board} selected={selected} moves={moves} />
             <HistoryPanel history={history} />
+            <div
+              css={css`
+                display: flex;
+                gap: 30px;
+                width: 100%;
+                justify-content: center;
+                height: 100%;
+                align-items: flex-end;
+                button {
+                  width: 100%;
+                }
+              `}
+            >
+              <button onClick={reset}>Reset</button>
+              <button onClick={() => undo()}>Undo</button>
+            </div>
           </>
         )}
       </div>

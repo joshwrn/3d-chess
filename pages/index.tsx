@@ -10,7 +10,7 @@ import { GameOverScreen } from '../src/components/GameOverScreen'
 import type { History } from '../src/components/History'
 import { Sidebar } from '../src/components/Sidebar'
 import type { Board, Tile } from '../src/logic/board'
-import { DEFAULT_BOARD } from '../src/logic/board'
+import { createBoard } from '../src/logic/board'
 import type { Color, GameOverType, Move, Piece } from '../src/logic/pieces'
 import { Border } from '../src/models/Border'
 
@@ -27,16 +27,19 @@ export type GameOver = {
 }
 
 export const Home: FC = () => {
-  const [board, setBoard] = useState<Board>(DEFAULT_BOARD)
+  const [board, setBoard] = useState<Board>(createBoard())
   const [selected, setSelected] = useState<Piece | null>(null)
   const [moves, setMoves] = useState<Move[]>([])
   const [gameOver, setGameOver] = useState<GameOver | null>(null)
   const [history, setHistory] = useState<History[]>([])
+  const [turn, setTurn] = useState<Color>(`white`)
 
   const reset = () => {
-    setBoard(DEFAULT_BOARD)
+    setBoard(createBoard())
     setSelected(null)
     setMoves([])
+    setHistory([])
+    setTurn(`white`)
     setGameOver(null)
   }
 
@@ -58,6 +61,10 @@ export const Home: FC = () => {
         history={history}
         moves={moves}
         selected={selected}
+        reset={reset}
+        setBoard={setBoard}
+        setHistory={setHistory}
+        setTurn={setTurn}
       />
       <GameOverScreen gameOver={gameOver} reset={reset} />
       <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
@@ -78,6 +85,8 @@ export const Home: FC = () => {
           setMoves={setMoves}
           setGameOver={setGameOver}
           setHistory={setHistory}
+          turn={turn}
+          setTurn={setTurn}
         />
       </Canvas>
     </div>

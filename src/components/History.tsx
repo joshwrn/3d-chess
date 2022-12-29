@@ -46,8 +46,10 @@ export const HistoryPanel: FC<{
     <div
       css={css`
         position: relative;
-        width: 200px;
+        width: fit-content;
         z-index: 100;
+        height: 180px;
+        width: 210px;
         gap: 5px;
         display: flex;
         flex-direction: column;
