@@ -2,7 +2,6 @@ import type { FC } from 'react'
 import { useState } from 'react'
 
 import { css } from '@emotion/react'
-import { BsMap } from 'react-icons/bs'
 import {
   FaChessPawn,
   FaChessKnight,
@@ -12,118 +11,91 @@ import {
   FaChessKing,
 } from 'react-icons/fa'
 
-import type { Board, Tile } from '../logic/board'
-import type { Move } from '../logic/pieces'
+import type { Board } from '../logic/board'
+import type { Move, Piece } from '../logic/pieces'
 
 export const MiniMap: FC<{
   board: Board
-  selected: Tile | null
+  selected: Piece | null
   moves: Move[]
 }> = ({ board, selected, moves }) => {
   const [show, setShow] = useState<boolean>(false)
   return (
-    <>
-      <div
-        css={css`
-          position: absolute;
-          top: 50px;
-          left: 50px;
-          z-index: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          cursor: pointer;
-          svg {
-            color: #ffffff;
-          }
-        `}
-        onClick={() => setShow(!show)}
-      >
-        <BsMap size={30} />
-      </div>
-      {show && (
+    <div
+      css={css`
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        z-index: 1;
+        width: 200px;
+        height: 200px;
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 7px;
+        opacity: 0.8;
+      `}
+      onClick={() => setShow(!show)}
+    >
+      {board.map((row, i) => (
         <div
+          key={i}
           css={css`
             display: flex;
-            position: absolute;
-            flex-direction: column;
-            top: 50px;
-            left: 50px;
-            z-index: 1;
-            width: 200px;
-            height: 200px;
-            flex-shrink: 0;
-            overflow: hidden;
-            border-radius: 7px;
           `}
-          onClick={() => setShow(!show)}
         >
-          {board.map((row, i) => (
-            <div
-              key={i}
-              css={css`
-                display: flex;
-              `}
-            >
-              {row.map((tile, j) => {
-                const bg = `${(i + j) % 2 === 0 ? `#a5a5a5` : `#676767`}`
-                const isSelected =
-                  selected?.piece?.getId() === tile.piece?.getId?.()
-                const canMoveTo = () => {
-                  if (!selected?.piece) return false
+          {row.map((tile, j) => {
+            const bg = `${(i + j) % 2 === 0 ? `#a5a5a5` : `#676767`}`
+            const isSelected = selected?.getId() === tile.piece?.getId?.()
+            const canMoveTo = () => {
+              if (!selected) return false
 
-                  let canMove = false
-                  for (const move of moves) {
-                    const pos = selected.position || { x: 0, y: 0 }
+              let canMove = false
+              for (const move of moves) {
+                const pos = selected.position || { x: 0, y: 0 }
 
-                    if (
-                      pos.x + move.position.x === tile.position.x &&
-                      pos.y + move.position.y === tile.position.y
-                    ) {
-                      canMove = true
-                      break
-                    }
-                  }
-                  return canMove
+                if (
+                  pos.x + move.position.x === tile.position.x &&
+                  pos.y + move.position.y === tile.position.y
+                ) {
+                  canMove = true
+                  break
                 }
+              }
+              return canMove
+            }
 
-                const canMove = canMoveTo()
+            const canMove = canMoveTo()
 
-                return (
-                  <div
-                    key={j}
-                    css={css`
-                      height: 25px;
-                      width: 25px;
-                      background-color: ${canMove ? `red` : bg};
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      svg {
-                        color: ${isSelected ? `red` : tile.piece?.color};
-                      }
-                    `}
-                  >
-                    {tile && (
-                      <>
-                        {tile.piece?.type === `pawn` && <FaChessPawn />}
-                        {tile.piece?.type === `knight` && <FaChessKnight />}
-                        {tile.piece?.type === `bishop` && <FaChessBishop />}
-                        {tile.piece?.type === `rook` && <FaChessRook />}
-                        {tile.piece?.type === `queen` && <FaChessQueen />}
-                        {tile.piece?.type === `king` && <FaChessKing />}
-                      </>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          ))}
+            return (
+              <div
+                key={j}
+                css={css`
+                  height: 25px;
+                  width: 25px;
+                  background-color: ${canMove ? `red` : bg};
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  svg {
+                    color: ${isSelected ? `red` : tile.piece?.color};
+                  }
+                `}
+              >
+                {tile && (
+                  <>
+                    {tile.piece?.type === `pawn` && <FaChessPawn />}
+                    {tile.piece?.type === `knight` && <FaChessKnight />}
+                    {tile.piece?.type === `bishop` && <FaChessBishop />}
+                    {tile.piece?.type === `rook` && <FaChessRook />}
+                    {tile.piece?.type === `queen` && <FaChessQueen />}
+                    {tile.piece?.type === `king` && <FaChessKing />}
+                  </>
+                )}
+              </div>
+            )
+          })}
         </div>
-      )}
-    </>
+      ))}
+    </div>
   )
 }

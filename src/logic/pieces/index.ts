@@ -108,6 +108,7 @@ export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
 export type Move = {
   position: Position
   type: MoveTypes
+  piece: Piece
 }
 export type MoveFunction<T extends Piece = Piece> = (props: {
   piece: T
@@ -262,7 +263,7 @@ export const getFarMoves = ({
     const move = getMove(dir)
     const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
     if (type === `invalid`) break
-    moves.push({ position: move, type: type })
+    moves.push({ position: move, type: type, piece: piece })
     if (type === `capture` || type === `captureKing`) break
   }
   return moves
@@ -284,13 +285,11 @@ export const checkIfSelectedPieceCanMoveHere = ({
   moves,
   tile,
 }: {
-  selected: Tile | null
+  selected: Piece | null
   moves: Move[]
   tile: Tile
-}): Position | null => {
-  if (!selected?.piece) return null
-
-  let theMove: Position | null = null
+}): Move | null => {
+  if (!selected) return null
 
   for (const move of moves) {
     const pos = selected.position || { x: 0, y: 0 }
@@ -299,9 +298,8 @@ export const checkIfSelectedPieceCanMoveHere = ({
       pos.x + move.position.x === tile.position.x &&
       pos.y + move.position.y === tile.position.y
     ) {
-      theMove = move.position
-      break
+      return move
     }
   }
-  return theMove
+  return null
 }

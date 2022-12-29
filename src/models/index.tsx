@@ -151,9 +151,9 @@ export const variants: {
     z: 0,
   }),
   move: ({ movingTo }: VariantProps) => ({
-    x: getDistance(movingTo?.move.x),
+    x: getDistance(movingTo?.move.position.x),
     y: [1.4, 1.6, 0],
-    z: getDistance(movingTo?.move.y),
+    z: getDistance(movingTo?.move.position.y),
   }),
   replace: () => ({
     y: 100,

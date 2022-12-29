@@ -6,7 +6,7 @@ import { useSpring, animated } from '@react-spring/three'
 import type { GameOver, MovingTo, ThreeMouseEvent } from '../../pages'
 import type { Position, Tile, Board } from '../logic/board'
 import { copyBoard } from '../logic/board'
-import type { Color, Move } from '../logic/pieces'
+import type { Color, Move, Piece } from '../logic/pieces'
 import {
   detectGameOver,
   oppositeColor,
@@ -24,15 +24,17 @@ import { PawnModel } from '../models/Pawn'
 import { QueenComponent } from '../models/Queen'
 import { RookComponent } from '../models/Rook'
 import { TileComponent } from '../models/Tile'
+import type { History } from './History'
 
 export const BoardComponent: FC<{
-  selected: Tile | null
-  setSelected: (tile: Tile | null) => void
+  selected: Piece | null
+  setSelected: (piece: Piece | null) => void
   board: Board
   setBoard: React.Dispatch<React.SetStateAction<Board>>
   moves: Move[]
   setGameOver: (gameOver: GameOver | null) => void
   setMoves: (moves: Move[]) => void
+  setHistory: React.Dispatch<React.SetStateAction<History[]>>
 }> = ({
   selected,
   setSelected,
@@ -41,6 +43,7 @@ export const BoardComponent: FC<{
   moves,
   setMoves,
   setGameOver,
+  setHistory,
 }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
@@ -62,7 +65,7 @@ export const BoardComponent: FC<{
     setMoves(
       movesForPiece({ piece: tile.piece, board, propagateDetectCheck: true }),
     )
-    setSelected(tile)
+    setSelected(tile.piece)
     setLastSelected(tile)
     setRedLightPosition(tile.position)
   }
@@ -70,6 +73,19 @@ export const BoardComponent: FC<{
   const finishMovingPiece = (tile: Tile | null) => {
     if (!selected) return
     if (!tile) return
+    if (!movingTo) return
+    setHistory((prev) => {
+      return [
+        ...prev,
+        {
+          board: copyBoard(board),
+          to: tile.position,
+          from: selected.position,
+          type: movingTo.move.type,
+          piece: selected,
+        },
+      ]
+    })
     setBoard((prev) => {
       const newBoard = copyBoard(prev)
       const selectedTile = newBoard[selected.position.y][selected.position.x]
@@ -81,8 +97,8 @@ export const BoardComponent: FC<{
         }
       }
 
-      tileToMoveTo.piece = selected.piece
-        ? Object.assign({}, { ...selected.piece, position: tile.position })
+      tileToMoveTo.piece = selected
+        ? Object.assign({}, { ...selected, position: tile.position })
         : null
       selectedTile.piece = null
       return [...newBoard]
@@ -105,13 +121,9 @@ export const BoardComponent: FC<{
     }
   }, [board, turn])
 
-  const startMovingPiece = (
-    e: ThreeMouseEvent,
-    tile: Tile,
-    theMove: Position,
-  ) => {
+  const startMovingPiece = (e: ThreeMouseEvent, tile: Tile, nextTile: Move) => {
     e.stopPropagation()
-    setMovingTo({ move: theMove, tile: tile })
+    setMovingTo({ move: nextTile, tile: tile })
   }
 
   const { intensity } = useSpring({
@@ -142,7 +154,7 @@ export const BoardComponent: FC<{
         return row.map((tile, j) => {
           const bg = `${(i + j) % 2 === 0 ? `white` : `black`}`
           const isSelected =
-            tile.piece && selected?.piece?.getId() === tile.piece.getId()
+            tile.piece && selected?.getId() === tile.piece.getId()
 
           const canMoveHere = checkIfSelectedPieceCanMoveHere({
             tile,
@@ -173,7 +185,7 @@ export const BoardComponent: FC<{
             wasSelected: lastSelected
               ? lastSelected?.piece?.getId() === tile.piece?.getId()
               : false,
-            canMoveHere: canMoveHere,
+            canMoveHere: canMoveHere?.position ?? null,
             movingTo: isSelected && movingTo ? movingTo : null,
             pieceIsBeingReplaced: pieceIsBeingReplaced ? true : false,
             finishMovingPiece: () => finishMovingPiece(movingTo?.tile ?? null),
@@ -187,7 +199,7 @@ export const BoardComponent: FC<{
                 color={bg}
                 position={[j, 0.25, i]}
                 onClick={handleClick}
-                canMoveHere={canMoveHere}
+                canMoveHere={canMoveHere?.position ?? null}
                 isSelected={isSelected ? true : false}
               />
               <MeshWrapper key={pieceId} {...props}>

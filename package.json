@@ -28,13 +28,11 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",
-    "styled-components": "^5.3.6",
     "three": "^0.148.0",
     "typescript": "4.9.4"
   },
   "devDependencies": {
     "@eyecuelab/eslint-config-react": "^1.0.2",
-    "@types/styled-components": "^5.1.26",
     "@types/three": "^0.146.0",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
