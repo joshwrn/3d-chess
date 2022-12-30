@@ -1,29 +1,29 @@
 import type { FC } from 'react'
 import React, { useEffect, useState } from 'react'
 
-import { useSpring, animated } from '@react-spring/three'
-
-import type { GameOver, MovingTo, ThreeMouseEvent } from '../../pages'
-import type { Position, Tile, Board } from '../logic/board'
-import { copyBoard } from '../logic/board'
-import type { Color, Move, Piece } from '../logic/pieces'
+import type { Position, Tile, Board } from '@logic/board'
+import { copyBoard } from '@logic/board'
+import type { Color, Move, Piece } from '@logic/pieces'
 import {
   detectGameOver,
   oppositeColor,
   shouldPromotePawn,
   checkIfSelectedPieceCanMoveHere,
   movesForPiece,
-} from '../logic/pieces'
-import { isPawn } from '../logic/pieces/pawn'
-import type { ModelProps } from '../models'
-import { MeshWrapper } from '../models'
-import { BishopComponent } from '../models/Bishop'
-import { KingComponent } from '../models/King'
-import { KnightComponent } from '../models/Knight'
-import { PawnModel } from '../models/Pawn'
-import { QueenComponent } from '../models/Queen'
-import { RookComponent } from '../models/Rook'
-import { TileComponent } from '../models/Tile'
+} from '@logic/pieces'
+import { isPawn } from '@logic/pieces/pawn'
+import { BishopComponent } from '@models/Bishop'
+import type { ModelProps } from '@models/index'
+import { MeshWrapper } from '@models/index'
+import { KingComponent } from '@models/King'
+import { KnightComponent } from '@models/Knight'
+import { PawnModel } from '@models/Pawn'
+import { QueenComponent } from '@models/Queen'
+import { RookComponent } from '@models/Rook'
+import { TileComponent } from '@models/Tile'
+import type { GameOver, MovingTo, ThreeMouseEvent } from '@pages/index'
+import { useSpring, animated } from '@react-spring/three'
+
 import type { History } from './History'
 
 export const BoardComponent: FC<{
@@ -95,7 +95,7 @@ export const BoardComponent: FC<{
       const selectedTile = newBoard[selected.position.y][selected.position.x]
       const tileToMoveTo = newBoard[tile.position.y][tile.position.x]
       if (isPawn(selectedTile.piece)) {
-        selectedTile.piece = { ...selectedTile.piece, firstMove: false }
+        selectedTile.piece = { ...selectedTile.piece, hasMoved: true }
         if (shouldPromotePawn({ tile })) {
           selectedTile.piece.type = `queen`
         }

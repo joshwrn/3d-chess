@@ -1,6 +1,8 @@
 import React, { useRef } from 'react'
 import type { FC } from 'react'
 
+import type { Position } from '@logic/board'
+import type { MovingTo } from '@pages/index'
 import type {
   AnimationControls,
   TargetAndTransition,
@@ -8,9 +10,6 @@ import type {
   Transition,
 } from 'framer-motion'
 import { motion } from 'framer-motion-3d'
-
-import type { MovingTo } from '../../pages'
-import type { Position } from '../logic/board'
 
 export const PieceMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & { isSelected: boolean }

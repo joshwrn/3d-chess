@@ -20,8 +20,9 @@ export const rookMoves: MoveFunction = ({
 
 export const createRook = ({ color, id, position }: PieceFactory): Rook => {
   return {
+    hasMoved: false,
     ...getBasePiece({ color, id, type: `rook`, position }),
   }
 }
 
-export type Rook = Piece
+export type Rook = Piece & { hasMoved: boolean }

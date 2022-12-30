@@ -1,9 +1,8 @@
 import type { FC } from 'react'
 
 import { css } from '@emotion/react'
-
-import type { Board, Position } from '../logic/board'
-import type { MoveTypes, Piece } from '../logic/pieces'
+import type { Board, Position } from '@logic/board'
+import type { MoveTypes, Piece } from '@logic/pieces'
 
 export type History = {
   board: Board

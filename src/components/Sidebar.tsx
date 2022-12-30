@@ -2,11 +2,11 @@ import type { FC } from 'react'
 import React from 'react'
 
 import { css } from '@emotion/react'
+import type { Board } from '@logic/board'
+import type { Color, Move, Piece } from '@logic/pieces'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
-import type { Board } from '../logic/board'
-import type { Color, Move, Piece } from '../logic/pieces'
 import type { History } from './History'
 import { HistoryPanel } from './History'
 import { MiniMap } from './MiniMap'

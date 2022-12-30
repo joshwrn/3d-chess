@@ -11,13 +11,13 @@ export const pawnMoves: MoveFunction<Pawn> = ({
   board,
   propagateDetectCheck,
 }) => {
-  const { firstMove, color } = piece
+  const { hasMoved, color } = piece
   const colorMultiplier = color === `white` ? -1 : 1
 
   const moves: Move[] = []
 
   const movesForward: Position[] = [{ x: 0, y: 1 * colorMultiplier }]
-  if (firstMove) {
+  if (!hasMoved) {
     movesForward.push({ x: 0, y: 2 * colorMultiplier })
   }
   for (const move of movesForward) {
@@ -44,13 +44,13 @@ export const pawnMoves: MoveFunction<Pawn> = ({
 }
 
 export const createPawn = ({ color, id, position }: PieceFactory): Pawn => {
-  const firstMove = true
+  const hasMoved = false
   return {
-    firstMove,
+    hasMoved,
     ...getBasePiece({ color, id, type: `pawn`, position }),
   }
 }
 
 export type Pawn = Piece & {
-  firstMove: boolean
+  hasMoved: boolean
 }

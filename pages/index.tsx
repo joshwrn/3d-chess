@@ -1,18 +1,17 @@
 import type { FC } from 'react'
 import { useState } from 'react'
 
+import { BoardComponent } from '@components/Board'
+import { GameOverScreen } from '@components/GameOverScreen'
+import type { History } from '@components/History'
+import { Sidebar } from '@components/Sidebar'
 import { css } from '@emotion/react'
+import type { Board, Tile } from '@logic/board'
+import { createBoard } from '@logic/board'
+import type { Color, GameOverType, Move, Piece } from '@logic/pieces'
+import { Border } from '@models/Border'
 import { Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-
-import { BoardComponent } from '../src/components/Board'
-import { GameOverScreen } from '../src/components/GameOverScreen'
-import type { History } from '../src/components/History'
-import { Sidebar } from '../src/components/Sidebar'
-import type { Board, Tile } from '../src/logic/board'
-import { createBoard } from '../src/logic/board'
-import type { Color, GameOverType, Move, Piece } from '../src/logic/pieces'
-import { Border } from '../src/models/Border'
 
 export type ThreeMouseEvent = {
   stopPropagation: () => void

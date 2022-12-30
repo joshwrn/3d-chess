@@ -21,7 +21,15 @@
     "incremental": true,
     "types": [
       "@emotion/react/types/css-prop"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["pages/*"],
+      "@logic/*": ["src/logic/*"],
+      "@models/*": ["src/models/*"],
+    }
   },
   "include": [
     "next-env.d.ts",

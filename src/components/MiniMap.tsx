@@ -1,6 +1,8 @@
 import type { FC } from 'react'
 
 import { css } from '@emotion/react'
+import type { Board } from '@logic/board'
+import type { Move, Piece } from '@logic/pieces'
 import {
   FaChessPawn,
   FaChessKnight,
@@ -9,9 +11,6 @@ import {
   FaChessQueen,
   FaChessKing,
 } from 'react-icons/fa'
-
-import type { Board } from '../logic/board'
-import type { Move, Piece } from '../logic/pieces'
 
 export const MiniMap: FC<{
   board: Board

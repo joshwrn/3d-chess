@@ -1883,6 +1883,11 @@ its-fine@^1.0.6:
   dependencies:
     "@types/react-reconciler" "^0.28.0"
 
+jotai@^1.12.0:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.12.0.tgz#2e22760289458f636f689ae0aa71cc4a089aa312"
+  integrity sha512-IhyBmjxU1sE2Ni/MUK7gQAb8QvCM6yd1/K5jtQzgQBmmjCjgfXZkkk1rYlQAIRp2KoQk0Y+yzhm1f5cZ7kegnw==
+
 js-sdsl@^4.1.4:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/js-sdsl/-/js-sdsl-4.2.0.tgz#278e98b7bea589b8baaf048c20aeb19eb7ad09d0"

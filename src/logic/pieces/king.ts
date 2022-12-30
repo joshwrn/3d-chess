@@ -24,8 +24,13 @@ export const kingMoves: MoveFunction = ({
 
 export const createKing = ({ color, id, position }: PieceFactory): King => {
   return {
+    hasMoved: false,
     ...getBasePiece({ color, id, type: `king`, position }),
   }
+}
+
+export type King = Piece & {
+  hasMoved: boolean
 }
 
 const KING_MOVES: Position[] = [
@@ -62,5 +67,3 @@ const KING_MOVES: Position[] = [
     y: -1,
   },
 ]
-
-export type King = Piece
