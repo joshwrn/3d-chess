@@ -3,6 +3,7 @@ import type { FC } from 'react'
 
 import type { Position } from '@logic/board'
 import type { MovingTo } from '@pages/index'
+import { useSpring, animated } from '@react-spring/three'
 import type {
   AnimationControls,
   TargetAndTransition,
@@ -12,21 +13,32 @@ import type {
 import { motion } from 'framer-motion-3d'
 
 export const PieceMaterial: FC<
-  JSX.IntrinsicElements[`meshPhysicalMaterial`] & { isSelected: boolean }
-> = ({ color, isSelected, ...props }) => (
-  <meshPhysicalMaterial
-    reflectivity={4}
-    color={color === `white` ? `#d9d9d9` : `#7c7c7c`}
-    emissive={isSelected ? `#733535` : color === `white` ? `#000000` : `#000000`}
-    metalness={1}
-    roughness={0.5}
-    attach="material"
-    envMapIntensity={0.2}
-    opacity={1}
-    transparent={true}
-    {...props}
-  />
-)
+  JSX.IntrinsicElements[`meshPhysicalMaterial`] & {
+    isSelected: boolean
+    pieceIsBeingReplaced: boolean
+  }
+> = ({ color, isSelected, pieceIsBeingReplaced, ...props }) => {
+  const { opacity } = useSpring({
+    opacity: pieceIsBeingReplaced ? 0 : 1,
+  })
+  return (
+    // @ts-ignore
+    <animated.meshPhysicalMaterial
+      reflectivity={4}
+      color={color === `white` ? `#d9d9d9` : `#7c7c7c`}
+      emissive={
+        isSelected ? `#733535` : color === `white` ? `#000000` : `#000000`
+      }
+      metalness={1}
+      roughness={0.5}
+      attach="material"
+      envMapIntensity={0.2}
+      opacity={opacity}
+      transparent={true}
+      {...props}
+    />
+  )
+}
 
 export type ModelProps = JSX.IntrinsicElements[`group`] & {
   color: string
@@ -49,12 +61,13 @@ export const MeshWrapper: FC<ModelProps> = ({
 }) => {
   const ref = useRef(null)
   const meshRef = useRef(null)
+
   return (
     <group ref={ref} {...props} dispose={null} castShadow>
       <motion.mesh
         ref={meshRef}
         scale={0.03}
-        castShadow
+        castShadow={pieceIsBeingReplaced ? false : true}
         receiveShadow
         initial={false}
         animate={
@@ -84,7 +97,11 @@ export const MeshWrapper: FC<ModelProps> = ({
         }}
       >
         {children}
-        <PieceMaterial color={props.color} isSelected={isSelected} />
+        <PieceMaterial
+          color={props.color}
+          pieceIsBeingReplaced={pieceIsBeingReplaced}
+          isSelected={isSelected}
+        />
       </motion.mesh>
     </group>
   )
@@ -155,8 +172,11 @@ export const variants: {
     z: getDistance(movingTo?.move.position.y),
   }),
   replace: () => ({
-    y: 100,
-    x: 0,
-    z: 0,
+    y: 20,
+    x: 5 * randomNegative(),
+    z: 10 * randomNegative(),
+    rotateX: (Math.PI / 4) * randomNegative(),
   }),
 }
+
+const randomNegative = () => (Math.random() > 0.5 ? -1 : 1)
