@@ -22,9 +22,8 @@ import { QueenComponent } from '@models/Queen'
 import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
 import type { GameOver, MovingTo, ThreeMouseEvent } from '@pages/index'
+import { useHistoryState } from '@pages/index'
 import { useSpring, animated } from '@react-spring/three'
-
-import type { History } from './History'
 
 export const BoardComponent: FC<{
   selected: Piece | null
@@ -34,7 +33,6 @@ export const BoardComponent: FC<{
   moves: Move[]
   setGameOver: (gameOver: GameOver | null) => void
   setMoves: (moves: Move[]) => void
-  setHistory: React.Dispatch<React.SetStateAction<History[]>>
   turn: Color
   setTurn: React.Dispatch<React.SetStateAction<Color>>
 }> = ({
@@ -45,12 +43,15 @@ export const BoardComponent: FC<{
   moves,
   setMoves,
   setGameOver,
-  setHistory,
   turn,
   setTurn,
 }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
+  const [history, setHistory] = useHistoryState((state) => [
+    state.history,
+    state.addItem,
+  ])
 
   const [redLightPosition, setRedLightPosition] = useState<Position>({
     x: 0,
@@ -78,17 +79,13 @@ export const BoardComponent: FC<{
     if (!selected) return
     if (!tile) return
     if (!movingTo) return
-    setHistory((prev) => {
-      return [
-        ...prev,
-        {
-          board: copyBoard(board),
-          to: tile.position,
-          from: selected.position,
-          type: movingTo.move.type,
-          piece: selected,
-        },
-      ]
+    setHistory({
+      board: copyBoard(board),
+      to: tile.position,
+      from: selected.position,
+      steps: movingTo.move.position,
+      type: movingTo.move.type,
+      piece: selected,
     })
     setBoard((prev) => {
       const newBoard = copyBoard(prev)

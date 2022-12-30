@@ -12,6 +12,7 @@ import type { Color, GameOverType, Move, Piece } from '@logic/pieces'
 import { Border } from '@models/Border'
 import { Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import create from 'zustand'
 
 export type ThreeMouseEvent = {
   stopPropagation: () => void
@@ -25,19 +26,31 @@ export type GameOver = {
   winner: Color
 }
 
+export const useHistoryState = create<{
+  history: History[]
+  reset: VoidFunction
+  addItem: (item: History) => void
+  undo: VoidFunction
+}>((set) => ({
+  history: [] as History[],
+  reset: () => set({ history: [] }),
+  addItem: (item) => set((state) => ({ history: [...state.history, item] })),
+  undo: () => set((state) => ({ history: state.history.slice(0, -1) })),
+}))
+
 export const Home: FC = () => {
   const [board, setBoard] = useState<Board>(createBoard())
   const [selected, setSelected] = useState<Piece | null>(null)
   const [moves, setMoves] = useState<Move[]>([])
   const [gameOver, setGameOver] = useState<GameOver | null>(null)
-  const [history, setHistory] = useState<History[]>([])
+  const resetHistory = useHistoryState((state) => state.reset)
   const [turn, setTurn] = useState<Color>(`white`)
 
   const reset = () => {
     setBoard(createBoard())
     setSelected(null)
     setMoves([])
-    setHistory([])
+    resetHistory()
     setTurn(`white`)
     setGameOver(null)
   }
@@ -57,12 +70,10 @@ export const Home: FC = () => {
     >
       <Sidebar
         board={board}
-        history={history}
         moves={moves}
         selected={selected}
         reset={reset}
         setBoard={setBoard}
-        setHistory={setHistory}
         setTurn={setTurn}
       />
       <GameOverScreen gameOver={gameOver} reset={reset} />
@@ -83,7 +94,6 @@ export const Home: FC = () => {
           moves={moves}
           setMoves={setMoves}
           setGameOver={setGameOver}
-          setHistory={setHistory}
           turn={turn}
           setTurn={setTurn}
         />

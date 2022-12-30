@@ -4,39 +4,32 @@ import React from 'react'
 import { css } from '@emotion/react'
 import type { Board } from '@logic/board'
 import type { Color, Move, Piece } from '@logic/pieces'
+import { useHistoryState } from '@pages/index'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
-import type { History } from './History'
 import { HistoryPanel } from './History'
 import { MiniMap } from './MiniMap'
 
 export const Sidebar: FC<{
   board: Board
-  history: History[]
   moves: Move[]
   selected: Piece | null
   setTurn: React.Dispatch<React.SetStateAction<Color>>
   setBoard: (board: Board) => void
-  setHistory: React.Dispatch<React.SetStateAction<History[]>>
   reset: () => void
-}> = ({
-  board,
-  history,
-  moves,
-  selected,
-  reset,
-  setBoard,
-  setHistory,
-  setTurn,
-}) => {
+}> = ({ board, moves, selected, reset, setBoard, setTurn }) => {
   const [show, setShow] = React.useState<boolean>(false)
+  const [history, undoHistory] = useHistoryState((state) => [
+    state.history,
+    state.undo,
+  ])
   const undo = () => {
     if (history.length > 0) {
       const last = history[history.length - 1]
       setBoard(last.board)
       setTurn((prev) => (prev === `white` ? `black` : `white`))
-      setHistory((prev) => prev.slice(0, prev.length - 1))
+      undoHistory()
     }
   }
   return (

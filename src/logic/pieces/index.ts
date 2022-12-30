@@ -103,6 +103,7 @@ export const moveTypes = {
   valid: `valid` as const,
   captureKing: `captureKing` as const,
   capture: `capture` as const,
+  captureEnPassant: `captureEnPassant` as const,
 }
 export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
 export type Move = {

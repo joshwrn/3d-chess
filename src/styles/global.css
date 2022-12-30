@@ -14,3 +14,7 @@ button {
 justify-content: center;
 border-radius: 4px;
 }
+
+html {
+    background-color: black;
+}

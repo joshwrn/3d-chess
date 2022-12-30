@@ -9,6 +9,7 @@ export type History = {
   from: Position
   to: Position
   type: MoveTypes
+  steps: Position
   piece: Piece
 }
 
