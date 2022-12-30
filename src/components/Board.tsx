@@ -25,6 +25,9 @@ import type { GameOver, MovingTo, ThreeMouseEvent } from '@pages/index'
 import { useHistoryState } from '@pages/index'
 import { useSpring, animated } from '@react-spring/three'
 
+import { isKing } from '@/logic/pieces/king'
+import { isRook } from '@/logic/pieces/rook'
+
 export const BoardComponent: FC<{
   selected: Piece | null
   setSelected: (piece: Piece | null) => void
@@ -91,11 +94,25 @@ export const BoardComponent: FC<{
       const newBoard = copyBoard(prev)
       const selectedTile = newBoard[selected.position.y][selected.position.x]
       const tileToMoveTo = newBoard[tile.position.y][tile.position.x]
-      if (isPawn(selectedTile.piece)) {
+
+      if (
+        isPawn(selectedTile.piece) ||
+        isKing(selectedTile.piece) ||
+        isRook(selectedTile.piece)
+      ) {
         selectedTile.piece = { ...selectedTile.piece, hasMoved: true }
-        if (shouldPromotePawn({ tile })) {
-          selectedTile.piece.type = `queen`
-        }
+      }
+      if (isPawn(selectedTile.piece) && shouldPromotePawn({ tile })) {
+        selectedTile.piece.type = `queen`
+      }
+
+      if (
+        isPawn(selectedTile.piece) &&
+        movingTo.move.type === `captureEnPassant`
+      ) {
+        const latestMove = history[history.length - 1]
+        const enPassantTile = newBoard[latestMove.to.y][latestMove.to.x]
+        enPassantTile.piece = null
       }
 
       tileToMoveTo.piece = selectedTile.piece
