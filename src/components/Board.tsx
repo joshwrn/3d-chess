@@ -187,9 +187,16 @@ export const BoardComponent: FC<{
             movingTo?.tile.piece && tile.piece ? tileId === movingToId : false
 
           const handleClick = (e: ThreeMouseEvent) => {
-            if (tile.piece && !canMoveHere && tile.piece?.color !== turn) {
+            const pieceIsCurrentPlayers =
+              tile.piece && tile.piece?.color !== turn
+            const tileIsEmpty = !tile.piece
+            if (
+              (!canMoveHere && pieceIsCurrentPlayers && !tileIsEmpty) ||
+              movingTo
+            ) {
               return
             }
+
             canMoveHere
               ? startMovingPiece(e, tile, canMoveHere)
               : selectThisPiece(e, tile)
