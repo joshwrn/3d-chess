@@ -18,9 +18,9 @@ export const GameOverScreen: FC<{
             width: 50vw;
             min-width: 300px;
             height: 300px;
-            background-color: #ffffff2c;
+            background-color: #00000067;
             backdrop-filter: blur(10px);
-            border: 1px solid #ffffff29;
+            border: 1px solid #ffffff12;
             border-radius: 10px;
             display: flex;
             gap: 1rem;
