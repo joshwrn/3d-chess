@@ -8,6 +8,7 @@ import { useHistoryState } from '@pages/index'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
+import { HistoryPanel } from './History'
 import { MiniMap } from './MiniMap'
 
 export const Sidebar: FC<{
@@ -77,6 +78,7 @@ export const Sidebar: FC<{
           <>
             <AiFillCloseCircle onClick={() => setShow(!show)} />
             <MiniMap board={board} selected={selected} moves={moves} />
+            <HistoryPanel />
             <div
               css={css`
                 display: flex;
