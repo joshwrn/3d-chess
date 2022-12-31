@@ -128,7 +128,6 @@ export const BoardComponent: FC<{
             movingTo.move.castling.rookNewPosition.x
           ]
         if (!isRook(rookTile.piece)) return prev
-        console.log(`moved`)
 
         rookTileToMoveTo.piece = {
           ...rookTile.piece,
@@ -145,22 +144,13 @@ export const BoardComponent: FC<{
       return newBoard
     })
 
-    setTurn((prev) => {
-      console.log(`setting`, prev, `to`, oppositeColor(prev))
-
-      const next = oppositeColor(prev)
-      return next
-    })
+    setTurn((prev) => oppositeColor(prev))
 
     setMovingTo(null)
     setMoves([])
     setSelected(null)
     setLastSelected(null)
   }
-
-  useEffect(() => {
-    console.log(turn)
-  }, [turn])
 
   useEffect(() => {
     const gameOverType = detectGameOver(board, turn)
