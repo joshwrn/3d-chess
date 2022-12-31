@@ -248,16 +248,9 @@ export const getMove = ({
     steps,
     newPosition: nextPosition,
   }
-  if (propagateDetectCheck && willBeInCheck(piece, board, steps)) {
-    return getFar
-      ? {
-          ...props,
-          type: `willBeInCheck`,
-          capture: null,
-        }
-      : null
-  }
-  if (cur.piece?.color === oppositeColor(piece.color)) {
+  const willBeCheck = propagateDetectCheck && willBeInCheck(piece, board, steps)
+
+  if (cur.piece?.color === oppositeColor(piece.color) && !willBeCheck) {
     return {
       ...props,
       type: cur.piece.type === `king` ? `captureKing` : `capture`,
@@ -266,6 +259,16 @@ export const getMove = ({
   }
   if (cur.piece) {
     return null
+  }
+
+  if (willBeCheck) {
+    return getFar
+      ? {
+          ...props,
+          type: `willBeInCheck`,
+          capture: null,
+        }
+      : null
   }
 
   return {
