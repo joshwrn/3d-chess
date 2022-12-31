@@ -3,6 +3,7 @@ import type { FC } from 'react'
 import { css } from '@emotion/react'
 import type { Board } from '@logic/board'
 import type { Move, Piece } from '@logic/pieces'
+import { checkIfSelectedPieceCanMoveHere } from '@logic/pieces'
 import {
   FaChessPawn,
   FaChessKnight,
@@ -42,25 +43,11 @@ export const MiniMap: FC<{
           {row.map((tile, j) => {
             const bg = `${(i + j) % 2 === 0 ? `#a5a5a5` : `#676767`}`
             const isSelected = selected?.getId() === tile.piece?.getId?.()
-            const canMoveTo = () => {
-              if (!selected) return false
-
-              let canMove = false
-              for (const move of moves) {
-                const pos = selected.position || { x: 0, y: 0 }
-
-                if (
-                  pos.x + move.newPosition.x === tile.position.x &&
-                  pos.y + move.newPosition.y === tile.position.y
-                ) {
-                  canMove = true
-                  break
-                }
-              }
-              return canMove
-            }
-
-            const canMove = canMoveTo()
+            const canMove = checkIfSelectedPieceCanMoveHere({
+              selected,
+              moves,
+              tile,
+            })
 
             return (
               <div
