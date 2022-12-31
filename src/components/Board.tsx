@@ -107,6 +107,7 @@ export const BoardComponent: FC<{
       }
       if (isPawn(selectedTile.piece) && shouldPromotePawn({ tile })) {
         selectedTile.piece.type = `queen`
+        selectedTile.piece.id = selectedTile.piece.id + 1
       }
 
       if (
