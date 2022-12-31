@@ -7,7 +7,7 @@ import type { History } from '@components/History'
 import { Sidebar } from '@components/Sidebar'
 import { css } from '@emotion/react'
 import type { Board, Tile } from '@logic/board'
-import { createBoard } from '@logic/board'
+import { getTestBoard, createBoard } from '@logic/board'
 import type { Color, GameOverType, Move, Piece } from '@logic/pieces'
 import { Border } from '@models/Border'
 import { Environment, OrbitControls } from '@react-three/drei'
@@ -39,7 +39,42 @@ export const useHistoryState = create<{
 }))
 
 export const Home: FC = () => {
-  const [board, setBoard] = useState<Board>(createBoard())
+  const [board, setBoard] = useState<Board>(
+    getTestBoard([
+      {
+        position: { x: 7, y: 7 },
+        piece: {
+          color: `white`,
+          id: 1,
+          type: `king`,
+        },
+      },
+      {
+        position: { x: 7, y: 0 },
+        piece: {
+          color: `black`,
+          id: 1,
+          type: `king`,
+        },
+      },
+      {
+        position: { x: 5, y: 7 },
+        piece: {
+          color: `black`,
+          id: 1,
+          type: `queen`,
+        },
+      },
+      {
+        position: { x: 0, y: 7 },
+        piece: {
+          color: `white`,
+          id: 1,
+          type: `queen`,
+        },
+      },
+    ]),
+  )
   const [selected, setSelected] = useState<Piece | null>(null)
   const [moves, setMoves] = useState<Move[]>([])
   const [gameOver, setGameOver] = useState<GameOver | null>(null)
