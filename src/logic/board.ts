@@ -1,6 +1,7 @@
 import type { Piece, PieceArgs } from './pieces'
 import { createPiece } from './pieces'
 import type { Pawn } from './pieces/pawn'
+import type { Rook } from './pieces/rook'
 
 export type Position = { x: number; y: number }
 
@@ -8,7 +9,7 @@ export type Board = Tile[][]
 
 export type Tile = {
   position: Position
-  piece: Pawn | Piece | null
+  piece: Pawn | Piece | Rook | null
 }
 export const createTile = (position: Position, piece?: PieceArgs): Tile => {
   return {

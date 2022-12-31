@@ -118,6 +118,26 @@ export const BoardComponent: FC<{
         enPassantTile.piece = null
       }
 
+      if (movingTo.move.castling) {
+        const rookTile =
+          newBoard[movingTo.move.castling.rook.position.y][
+            movingTo.move.castling.rook.position.x
+          ]
+        const rookTileToMoveTo =
+          newBoard[movingTo.move.castling.rookNewPosition.y][
+            movingTo.move.castling.rookNewPosition.x
+          ]
+        if (!isRook(rookTile.piece)) return prev
+        console.log(`moved`)
+
+        rookTileToMoveTo.piece = {
+          ...rookTile.piece,
+          hasMoved: true,
+          position: rookTileToMoveTo.position,
+        }
+        rookTile.piece = null
+      }
+
       tileToMoveTo.piece = selectedTile.piece
         ? { ...selectedTile.piece, position: tile.position }
         : null
@@ -126,6 +146,8 @@ export const BoardComponent: FC<{
     })
 
     setTurn((prev) => {
+      console.log(`setting`, prev, `to`, oppositeColor(prev))
+
       const next = oppositeColor(prev)
       return next
     })
@@ -135,6 +157,10 @@ export const BoardComponent: FC<{
     setSelected(null)
     setLastSelected(null)
   }
+
+  useEffect(() => {
+    console.log(turn)
+  }, [turn])
 
   useEffect(() => {
     const gameOverType = detectGameOver(board, turn)
@@ -184,10 +210,11 @@ export const BoardComponent: FC<{
             selected,
           })
 
-          const movingToId = movingTo?.tile?.piece?.getId()
           const tileId = tile.piece?.getId()
           const pieceIsBeingReplaced =
-            movingTo?.tile.piece && tile.piece ? tileId === movingToId : false
+            movingTo?.move.piece && tile.piece
+              ? tileId === movingTo?.move.capture?.getId()
+              : false
           const rookCastled = movingTo?.move.castling?.rook
           const isBeingCastled =
             rookCastled && rookCastled.getId() === tile.piece?.getId()
@@ -227,7 +254,8 @@ export const BoardComponent: FC<{
                 ? movingTo.move.castling?.rookSteps ?? null
                 : null,
             pieceIsBeingReplaced: pieceIsBeingReplaced ? true : false,
-            finishMovingPiece: () => finishMovingPiece(movingTo?.tile ?? null),
+            finishMovingPiece: () =>
+              isBeingCastled ? null : finishMovingPiece(movingTo?.tile ?? null),
           }
 
           const pieceId = tile.piece?.getId() ?? `empty-${j}-${i}`

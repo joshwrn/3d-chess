@@ -3,6 +3,7 @@ import type { FC } from 'react'
 import { css } from '@emotion/react'
 import type { Board, Position } from '@logic/board'
 import type { MoveTypes, Piece } from '@logic/pieces'
+import { useHistoryState } from '@pages/index'
 
 export type History = {
   board: Board
@@ -40,9 +41,8 @@ const getLastFive = (arr: History[]) => {
   return arr.slice(arr.length - 5, arr.length)
 }
 
-export const HistoryPanel: FC<{
-  history: History[]
-}> = ({ history }) => {
+export const HistoryPanel: FC = () => {
+  const history = useHistoryState((state) => state.history)
   return (
     <div
       css={css`

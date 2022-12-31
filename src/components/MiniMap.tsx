@@ -50,8 +50,8 @@ export const MiniMap: FC<{
                 const pos = selected.position || { x: 0, y: 0 }
 
                 if (
-                  pos.x + move.position.x === tile.position.x &&
-                  pos.y + move.position.y === tile.position.y
+                  pos.x + move.newPosition.x === tile.position.x &&
+                  pos.y + move.newPosition.y === tile.position.y
                 ) {
                   canMove = true
                   break

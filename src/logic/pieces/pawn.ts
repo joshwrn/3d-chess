@@ -23,8 +23,11 @@ const canEnPassant = (piece: Piece, colorMultiplier: number) => {
     const canEnPassant = isSameY && (isOnRight || isOnLeft)
     if (canEnPassant) {
       return {
-        x: isOnLeft ? -1 : 1,
-        y: colorMultiplier,
+        steps: {
+          x: isOnLeft ? -1 : 1,
+          y: colorMultiplier,
+        },
+        piece: lastMove.piece,
       }
     }
   }
@@ -68,14 +71,11 @@ export const pawnMoves: MoveFunction<Pawn> = ({
     moves.push({
       piece,
       type: `captureEnPassant`,
-      steps: { x: enPassant.x, y: enPassant.y * -1 },
-      capture: getPieceFromBoard(board, {
-        x: piece.position.x + enPassant.x,
-        y: piece.position.y + enPassant.y * -1,
-      }),
+      steps: enPassant.steps,
+      capture: enPassant.piece,
       newPosition: {
-        x: piece.position.x + enPassant.x,
-        y: piece.position.y + enPassant.y,
+        x: piece.position.x + enPassant.steps.x,
+        y: piece.position.y + enPassant.steps.y,
       },
     })
   }

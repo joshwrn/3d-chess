@@ -1,5 +1,6 @@
 import type { Board, Position, Tile } from '../board'
 import { bishopMoves, createBishop, isBishop } from './bishop'
+import type { King } from './king'
 import { createKing, isKing, kingMoves } from './king'
 import { createKnight, isKnight, knightMoves } from './knight'
 import type { Pawn } from './pawn'
@@ -27,18 +28,14 @@ export const movesForPiece = ({
   board,
   propagateDetectCheck,
 }: {
-  piece: Pawn | Piece | null
+  piece: King | Pawn | Piece | null
   board: Board
   propagateDetectCheck: boolean
 }): Move[] => {
   if (!piece) return []
   const props = { piece, board, propagateDetectCheck }
   if (isPawn(piece)) {
-    return pawnMoves({ ...props } as {
-      piece: Pawn
-      board: Board
-      propagateDetectCheck: boolean
-    })
+    return pawnMoves({ ...props, piece: piece as Pawn })
   }
   if (isRook(piece)) {
     return rookMoves(props)
@@ -53,7 +50,7 @@ export const movesForPiece = ({
     return queenMoves(props)
   }
   if (isKing(piece)) {
-    return kingMoves(props)
+    return kingMoves({ ...props, piece: piece as King })
   }
   return []
 }
@@ -104,6 +101,7 @@ export const moveTypes = {
   captureKing: `captureKing` as const,
   capture: `capture` as const,
   captureEnPassant: `captureEnPassant` as const,
+  castling: `castling` as const,
 }
 export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
 export type Move = {
