@@ -1,6 +1,6 @@
 import type { Position } from '../board'
 import type { MoveFunction, Piece, PieceFactory } from './'
-import { classifyMoveType, getBasePiece } from './'
+import { getMove, getBasePiece } from './'
 
 export function isKnight(value: Knight | Piece | null): value is Knight {
   return value?.type === `knight`
@@ -12,10 +12,10 @@ export const knightMoves: MoveFunction = ({
   propagateDetectCheck,
 }) => {
   const moves = []
-  for (const move of KNIGHT_MOVES) {
-    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
-    if (type === `invalid`) continue
-    moves.push({ position: move, type: type })
+  for (const steps of KNIGHT_MOVES) {
+    const move = getMove({ piece, board, steps, propagateDetectCheck })
+    if (!move) continue
+    moves.push(move)
   }
 
   return moves

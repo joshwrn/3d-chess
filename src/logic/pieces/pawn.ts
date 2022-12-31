@@ -1,8 +1,8 @@
 import { useHistoryState } from '@pages/index'
 
-import type { Position } from '../board'
+import type { Position, Tile } from '../board'
 import type { Move, MoveFunction, Piece, PieceFactory } from './'
-import { classifyMoveType, getBasePiece } from './'
+import { getMove, getBasePiece } from './'
 
 export function isPawn(value: Pawn | Piece | null): value is Pawn {
   return value?.type === `pawn`
@@ -31,6 +31,15 @@ const canEnPassant = (piece: Piece, colorMultiplier: number) => {
   return null
 }
 
+export const getPieceFromBoard = (
+  board: Tile[][],
+  position: Position,
+): Piece | null => {
+  const { x, y } = position
+  const { piece } = board[y][x]
+  return piece || null
+}
+
 export const pawnMoves: MoveFunction<Pawn> = ({
   piece,
   board,
@@ -45,10 +54,10 @@ export const pawnMoves: MoveFunction<Pawn> = ({
   if (!hasMoved) {
     movesForward.push({ x: 0, y: 2 * colorMultiplier })
   }
-  for (const move of movesForward) {
-    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
-    if (type !== `invalid` && type !== `capture` && type !== `captureKing`) {
-      moves.push({ position: move, type: type })
+  for (const steps of movesForward) {
+    const move = getMove({ piece, board, steps, propagateDetectCheck })
+    if (move && move.type !== `capture` && move.type !== `captureKing`) {
+      moves.push(move)
     } else {
       break
     }
@@ -57,8 +66,17 @@ export const pawnMoves: MoveFunction<Pawn> = ({
   const enPassant = canEnPassant(piece, colorMultiplier)
   if (enPassant) {
     moves.push({
-      position: enPassant,
+      piece,
       type: `captureEnPassant`,
+      steps: { x: enPassant.x, y: enPassant.y * -1 },
+      capture: getPieceFromBoard(board, {
+        x: piece.position.x + enPassant.x,
+        y: piece.position.y + enPassant.y * -1,
+      }),
+      newPosition: {
+        x: piece.position.x + enPassant.x,
+        y: piece.position.y + enPassant.y,
+      },
     })
   }
 
@@ -66,10 +84,10 @@ export const pawnMoves: MoveFunction<Pawn> = ({
     { x: 1, y: 1 * colorMultiplier },
     { x: -1, y: 1 * colorMultiplier },
   ]
-  for (const move of movesDiagonal) {
-    const type = classifyMoveType({ piece, board, move, propagateDetectCheck })
-    if (type === `capture` || type === `captureKing`) {
-      moves.push({ position: move, type: type })
+  for (const steps of movesDiagonal) {
+    const move = getMove({ piece, board, steps, propagateDetectCheck })
+    if (move?.type === `capture` || move?.type === `captureKing`) {
+      moves.push(move)
     }
   }
 

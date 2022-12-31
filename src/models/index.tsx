@@ -2,7 +2,6 @@ import React, { useRef } from 'react'
 import type { FC } from 'react'
 
 import type { Position } from '@logic/board'
-import type { MovingTo } from '@pages/index'
 import { useSpring, animated } from '@react-spring/three'
 import type {
   AnimationControls,
@@ -44,7 +43,7 @@ export type ModelProps = JSX.IntrinsicElements[`group`] & {
   color: string
   isSelected: boolean
   canMoveHere: Position | null
-  movingTo: MovingTo | null
+  movingTo: Position | null
   finishMovingPiece: () => void
   pieceIsBeingReplaced: boolean
   wasSelected: boolean
@@ -148,7 +147,7 @@ export type VariantReturns =
   | boolean
 export type VariantProps = {
   isSelected: boolean
-  movingTo: MovingTo | null
+  movingTo: Position | null
 }
 
 type VariantFunction = (props: VariantProps) => VariantReturns
@@ -167,9 +166,9 @@ export const variants: {
     z: 0,
   }),
   move: ({ movingTo }: VariantProps) => ({
-    x: getDistance(movingTo?.move.position.x),
+    x: getDistance(movingTo?.x),
     y: [1.4, 1.6, 0],
-    z: getDistance(movingTo?.move.position.y),
+    z: getDistance(movingTo?.y),
   }),
   replace: () => ({
     y: 20,

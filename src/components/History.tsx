@@ -8,6 +8,7 @@ export type History = {
   board: Board
   from: Position
   to: Position
+  capture: Piece | null
   type: MoveTypes
   steps: Position
   piece: Piece

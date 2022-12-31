@@ -5,6 +5,7 @@ import type { Position, Tile, Board } from '@logic/board'
 import { copyBoard } from '@logic/board'
 import type { Color, Move, Piece } from '@logic/pieces'
 import {
+  getTile,
   detectGameOver,
   oppositeColor,
   shouldPromotePawn,
@@ -84,16 +85,18 @@ export const BoardComponent: FC<{
     if (!movingTo) return
     setHistory({
       board: copyBoard(board),
-      to: tile.position,
-      from: selected.position,
-      steps: movingTo.move.position,
+      to: movingTo.move.newPosition,
+      from: movingTo.move.piece.position,
+      steps: movingTo.move.steps,
+      capture: movingTo.move.capture,
       type: movingTo.move.type,
-      piece: selected,
+      piece: movingTo.move.piece,
     })
     setBoard((prev) => {
       const newBoard = copyBoard(prev)
-      const selectedTile = newBoard[selected.position.y][selected.position.x]
-      const tileToMoveTo = newBoard[tile.position.y][tile.position.x]
+      const selectedTile = getTile(newBoard, selected.position)
+      const tileToMoveTo = getTile(newBoard, tile.position)
+      if (!selectedTile || !tileToMoveTo) return prev
 
       if (
         isPawn(selectedTile.piece) ||
@@ -185,6 +188,9 @@ export const BoardComponent: FC<{
           const tileId = tile.piece?.getId()
           const pieceIsBeingReplaced =
             movingTo?.tile.piece && tile.piece ? tileId === movingToId : false
+          const rookCastled = movingTo?.move.castling?.rook
+          const isBeingCastled =
+            rookCastled && rookCastled.getId() === tile.piece?.getId()
 
           const handleClick = (e: ThreeMouseEvent) => {
             if (movingTo) {
@@ -213,8 +219,13 @@ export const BoardComponent: FC<{
             wasSelected: lastSelected
               ? lastSelected?.piece?.getId() === tile.piece?.getId()
               : false,
-            canMoveHere: canMoveHere?.position ?? null,
-            movingTo: isSelected && movingTo ? movingTo : null,
+            canMoveHere: canMoveHere?.newPosition ?? null,
+            movingTo:
+              isSelected && movingTo
+                ? movingTo.move.steps
+                : isBeingCastled
+                ? movingTo.move.castling?.rookSteps ?? null
+                : null,
             pieceIsBeingReplaced: pieceIsBeingReplaced ? true : false,
             finishMovingPiece: () => finishMovingPiece(movingTo?.tile ?? null),
           }
@@ -227,7 +238,7 @@ export const BoardComponent: FC<{
                 color={bg}
                 position={[j, 0.25, i]}
                 onClick={handleClick}
-                canMoveHere={canMoveHere?.position ?? null}
+                canMoveHere={canMoveHere?.newPosition ?? null}
                 isSelected={isSelected ? true : false}
               />
               <MeshWrapper key={pieceId} {...props}>
