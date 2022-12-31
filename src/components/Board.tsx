@@ -257,7 +257,6 @@ export const BoardComponent: FC<{
                 position={[j, 0.25, i]}
                 onClick={handleClick}
                 canMoveHere={canMoveHere?.newPosition ?? null}
-                isSelected={isSelected ? true : false}
               />
               <MeshWrapper key={pieceId} {...props}>
                 {tile.piece?.type === `pawn` && <PawnModel />}

@@ -29,10 +29,9 @@ const getEmissive = (color: string, canMoveHere: boolean) => {
 
 export const TileMaterial: FC<
   JSX.IntrinsicElements[`meshPhysicalMaterial`] & {
-    isSelected: boolean
     canMoveHere: Position | null
   }
-> = ({ color, canMoveHere, isSelected, ...props }) => {
+> = ({ color, canMoveHere, ...props }) => {
   const { tileColor, emissiveColor } = useSpring({
     tileColor: getColor(color as string, !!canMoveHere),
     emissiveColor: getEmissive(color as string, !!canMoveHere),
@@ -58,17 +57,12 @@ export const TileComponent: FC<
   JSX.IntrinsicElements[`mesh`] & {
     canMoveHere: Position | null
     color: string
-    isSelected: boolean
   }
-> = ({ color, canMoveHere, isSelected, ...props }) => {
+> = ({ color, canMoveHere, ...props }) => {
   return (
     <mesh scale={[1, 0.5, 1]} receiveShadow castShadow {...props}>
       <boxGeometry />
-      <TileMaterial
-        color={color}
-        isSelected={isSelected}
-        canMoveHere={canMoveHere}
-      />
+      <TileMaterial color={color} canMoveHere={canMoveHere} />
     </mesh>
   )
 }
