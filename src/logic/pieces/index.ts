@@ -104,7 +104,6 @@ export const moveTypes = {
   captureEnPassant: `captureEnPassant` as const,
   castling: `castling` as const,
   willBeInCheck: `willBeInCheck` as const,
-  check: `check` as const,
 }
 export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
 export type Move = {
@@ -253,7 +252,7 @@ export const getMove = ({
     return getFar
       ? {
           ...props,
-          type: `check`,
+          type: `willBeInCheck`,
           capture: null,
         }
       : null
@@ -301,7 +300,7 @@ export const getFarMoves = ({
       getFar: true,
     })
     if (!move) break
-    if (move.type === `check`) continue
+    if (move.type === `willBeInCheck`) continue
     moves.push(move)
     if (move.type === `capture` || move.type === `captureKing`) break
   }
