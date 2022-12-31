@@ -77,7 +77,7 @@ export const Home: FC = () => {
         setTurn={setTurn}
       />
       <GameOverScreen gameOver={gameOver} reset={reset} />
-      <Canvas shadows camera={{ position: [-5, 2, 10], fov: 70 }}>
+      <Canvas shadows camera={{ position: [-10, 5, 6], fov: 70 }}>
         <OrbitControls
           maxDistance={25}
           minDistance={7}

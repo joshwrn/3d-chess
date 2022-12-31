@@ -63,6 +63,7 @@ export const Sidebar: FC<{
           height: 100%;
           z-index: 1;
           user-select: none;
+          backdrop-filter: blur(10px);
           > svg {
             position: absolute;
             top: 30px;
