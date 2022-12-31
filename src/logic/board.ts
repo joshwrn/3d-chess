@@ -237,3 +237,38 @@ export const getTestBoard = (
   }
   return board
 }
+
+export const TEST_EXAMPLE = [
+  {
+    position: { x: 7, y: 7 },
+    piece: {
+      color: `white`,
+      id: 1,
+      type: `king`,
+    },
+  },
+  {
+    position: { x: 7, y: 0 },
+    piece: {
+      color: `black`,
+      id: 1,
+      type: `king`,
+    },
+  },
+  {
+    position: { x: 5, y: 7 },
+    piece: {
+      color: `black`,
+      id: 1,
+      type: `queen`,
+    },
+  },
+  {
+    position: { x: 0, y: 7 },
+    piece: {
+      color: `white`,
+      id: 1,
+      type: `queen`,
+    },
+  },
+]
