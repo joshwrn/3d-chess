@@ -1,4 +1,5 @@
 import type { Board, Position, Tile } from '../board'
+import { copyBoard } from '../board'
 import { bishopMoves, createBishop, isBishop } from './bishop'
 import type { King } from './king'
 import { createKing, isKing, kingMoves } from './king'
@@ -129,30 +130,15 @@ export const willBeInCheck = (
   board: Board,
   move: Position,
 ): boolean => {
-  let isCheck = false
-  const newBoard = board.map((row) =>
-    row.map((tile) => {
-      if (
-        tile.position.x === piece.position.x &&
-        tile.position.y === piece.position.y
-      ) {
-        return {
-          ...tile,
-          piece: null,
-        }
-      }
-      if (
-        tile.position.x === move.x + piece.position.x &&
-        tile.position.y === move.y + piece.position.y
-      ) {
-        return {
-          ...tile,
-          piece,
-        }
-      }
-      return tile
-    }),
-  )
+  const newBoard = copyBoard(board)
+  const tile = getTile(newBoard, piece.position)
+  const newTile = getTile(newBoard, {
+    x: move.x + piece.position.x,
+    y: move.y + piece.position.y,
+  })
+  if (!tile || !newTile) return false
+  newTile.piece = piece
+  tile.piece = null
 
   for (const tile of newBoard.flat()) {
     if (tile.piece?.color === oppositeColor(piece.color)) {
@@ -162,12 +148,11 @@ export const willBeInCheck = (
         propagateDetectCheck: false,
       })
       if (moves.find((move) => move.type === `captureKing`)) {
-        isCheck = true
-        return isCheck
+        return true
       }
     }
   }
-  return isCheck
+  return false
 }
 
 export type GameOverType = `checkmate` | `stalemate`
@@ -259,29 +244,31 @@ export const getMove = ({
   if (!row) return null
   const cur = row[nextPosition.x]
   if (!cur) return null
+  const props = {
+    piece,
+    steps,
+    newPosition: nextPosition,
+  }
   if (propagateDetectCheck && willBeInCheck(piece, board, steps)) {
     return getFar
       ? {
-          steps,
+          ...props,
           type: `check`,
-          piece,
           capture: null,
-          newPosition: nextPosition,
         }
       : null
   }
-  if (cur.piece) {
-    if (cur.piece?.color === oppositeColor(piece.color)) {
-      return {
-        steps,
-        type: cur.piece.type === `king` ? `captureKing` : `capture`,
-        piece,
-        capture: cur.piece,
-        newPosition: nextPosition,
-      }
+  if (cur.piece?.color === oppositeColor(piece.color)) {
+    return {
+      ...props,
+      type: cur.piece.type === `king` ? `captureKing` : `capture`,
+      capture: cur.piece,
     }
+  }
+  if (cur.piece) {
     return null
   }
+
   return {
     steps,
     type: `valid`,

@@ -216,12 +216,11 @@ export const createBoard = (): Board => {
   return DEFAULT_BOARD
 }
 
-export const getTestBoard = (
-  pieces: {
-    position: Position
-    piece: PieceArgs
-  }[],
-): Board => {
+type TestBoardArgs = {
+  position: Position
+  piece: PieceArgs
+}
+export const createTestBoard = (pieces: TestBoardArgs[]): Board => {
   const board = [
     ...Array(8)
       .fill(null)
@@ -238,7 +237,7 @@ export const getTestBoard = (
   return board
 }
 
-export const TEST_EXAMPLE = [
+export const TEST_EXAMPLE: TestBoardArgs[] = [
   {
     position: { x: 7, y: 7 },
     piece: {
