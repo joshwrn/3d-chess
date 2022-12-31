@@ -4,18 +4,9 @@ import { useSpring, animated } from '@react-spring/three'
 
 import type { Position } from '../logic/board'
 
-const getColor = (color: string, isSelected: boolean, canMoveHere: boolean) => {
-  // if (isSelected && color === `white`) {
-  //   return `#741818`
-  // }
-  // if (isSelected && color === `black`) {
-  //   return `#371212`
-  // }
+const getColor = (color: string, canMoveHere: boolean) => {
   if (canMoveHere) {
     return `#ff0101`
-  }
-  if (canMoveHere && color === `black`) {
-    return `#b42727`
   }
   if (color === `white`) {
     return `#aaaaaa`
@@ -26,30 +17,14 @@ const getColor = (color: string, isSelected: boolean, canMoveHere: boolean) => {
   return `purple`
 }
 
-const getEmissive = (
-  color: string,
-  isSelected: boolean,
-  canMoveHere: boolean,
-) => {
-  // if (isSelected && color === `white`) {
-  //   return `#876060`
-  // }
-  // if (isSelected && color === `black`) {
-  //   return `#371212`
-  // }
+const getEmissive = (color: string, canMoveHere: boolean) => {
   if (canMoveHere && color === `white`) {
     return `#ff0000`
   }
   if (canMoveHere && color === `black`) {
     return `#c50000`
   }
-  if (color === `white`) {
-    return `#323232`
-  }
-  if (color === `black`) {
-    return `#0c0c0c`
-  }
-  return `pink`
+  return `black`
 }
 
 export const TileMaterial: FC<
@@ -59,8 +34,8 @@ export const TileMaterial: FC<
   }
 > = ({ color, canMoveHere, isSelected, ...props }) => {
   const { tileColor, emissiveColor } = useSpring({
-    tileColor: getColor(color as string, isSelected, !!canMoveHere),
-    emissiveColor: getEmissive(color as string, isSelected, !!canMoveHere),
+    tileColor: getColor(color as string, !!canMoveHere),
+    emissiveColor: getEmissive(color as string, !!canMoveHere),
   })
   return (
     <>

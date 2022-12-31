@@ -25,9 +25,7 @@ export const PieceMaterial: FC<
     <animated.meshPhysicalMaterial
       reflectivity={4}
       color={color === `white` ? `#d9d9d9` : `#7c7c7c`}
-      emissive={
-        isSelected ? `#733535` : color === `white` ? `#000000` : `#000000`
-      }
+      emissive={isSelected ? `#733535` : `#000000`}
       metalness={1}
       roughness={0.5}
       attach="material"
