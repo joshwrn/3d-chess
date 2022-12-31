@@ -103,6 +103,7 @@ export const moveTypes = {
   captureEnPassant: `captureEnPassant` as const,
   castling: `castling` as const,
   willBeInCheck: `willBeInCheck` as const,
+  check: `check` as const,
 }
 export type MoveTypes = typeof moveTypes[keyof typeof moveTypes]
 export type Move = {
@@ -250,7 +251,7 @@ export const getMove = ({
   steps: Position
   propagateDetectCheck: boolean
   getFar?: boolean
-}): Move | `check` | null => {
+}): Move | null => {
   const { position } = piece
   const { x, y } = steps
   const nextPosition = { x: position.x + x, y: position.y + y }
@@ -259,7 +260,15 @@ export const getMove = ({
   const cur = row[nextPosition.x]
   if (!cur) return null
   if (propagateDetectCheck && willBeInCheck(piece, board, steps)) {
-    return getFar ? `check` : null
+    return getFar
+      ? {
+          steps,
+          type: `check`,
+          piece,
+          capture: null,
+          newPosition: nextPosition,
+        }
+      : null
   }
   if (cur.piece) {
     if (cur.piece?.color === oppositeColor(piece.color)) {
@@ -305,7 +314,7 @@ export const getFarMoves = ({
       getFar: true,
     })
     if (!move) break
-    if (move === `check`) continue
+    if (move.type === `check`) continue
     moves.push(move)
     if (move.type === `capture` || move.type === `captureKing`) break
   }
