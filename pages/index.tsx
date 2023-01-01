@@ -14,6 +14,8 @@ import { Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import create from 'zustand'
 
+import { Loader } from '@/components/Loader'
+
 export type ThreeMouseEvent = {
   stopPropagation: () => void
 }
@@ -77,6 +79,7 @@ export const Home: FC = () => {
         setTurn={setTurn}
       />
       <GameOverScreen gameOver={gameOver} reset={reset} />
+      <Loader />
       <Canvas shadows camera={{ position: [-10, 5, 6], fov: 70 }}>
         <OrbitControls
           maxDistance={25}
