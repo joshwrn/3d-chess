@@ -23,7 +23,7 @@ import { QueenComponent } from '@models/Queen'
 import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
 import type { GameOver, MovingTo, ThreeMouseEvent } from '@pages/index'
-import { useHistoryState } from '@pages/index'
+import { useGameSettingsState, useHistoryState } from '@pages/index'
 import { useSpring, animated } from '@react-spring/three'
 
 import { isKing } from '@/logic/pieces/king'
@@ -37,8 +37,6 @@ export const BoardComponent: FC<{
   moves: Move[]
   setGameOver: (gameOver: GameOver | null) => void
   setMoves: (moves: Move[]) => void
-  turn: Color
-  setTurn: React.Dispatch<React.SetStateAction<Color>>
 }> = ({
   selected,
   setSelected,
@@ -47,14 +45,16 @@ export const BoardComponent: FC<{
   moves,
   setMoves,
   setGameOver,
-  turn,
-  setTurn,
 }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
   const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [history, setHistory] = useHistoryState((state) => [
     state.history,
     state.addItem,
+  ])
+  const [turn, setTurn] = useGameSettingsState((state) => [
+    state.turn,
+    state.setTurn,
   ])
 
   const [redLightPosition, setRedLightPosition] = useState<Position>({
@@ -145,7 +145,7 @@ export const BoardComponent: FC<{
       return newBoard
     })
 
-    setTurn((prev) => oppositeColor(prev))
+    setTurn()
 
     setMovingTo(null)
     setMoves([])

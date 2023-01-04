@@ -3,8 +3,12 @@ import React from 'react'
 
 import { css } from '@emotion/react'
 import type { Board } from '@logic/board'
-import type { Color, Move, Piece } from '@logic/pieces'
-import { useHistoryState } from '@pages/index'
+import type { Move, Piece } from '@logic/pieces'
+import {
+  useGameSettingsState,
+  useHistoryState,
+  usePlayerState,
+} from '@pages/index'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
@@ -15,26 +19,28 @@ export const Sidebar: FC<{
   board: Board
   moves: Move[]
   selected: Piece | null
-  setTurn: React.Dispatch<React.SetStateAction<Color>>
   setBoard: (board: Board) => void
   reset: () => void
-}> = ({ board, moves, selected, reset, setBoard, setTurn }) => {
+}> = ({ board, moves, selected, reset, setBoard }) => {
   const [show, setShow] = React.useState<boolean>(false)
+  const setTurn = useGameSettingsState((state) => state.setTurn)
+  const joinedGame = usePlayerState((state) => state.joinedRoom)
   const [history, undoHistory] = useHistoryState((state) => [
     state.history,
     state.undo,
   ])
+  const gameType = useGameSettingsState((state) => state.gameType)
   const undo = () => {
     if (history.length > 0) {
       const last = history[history.length - 1]
       setBoard(last.board)
-      setTurn((prev) => (prev === `white` ? `black` : `white`))
+      setTurn()
       undoHistory()
     }
   }
   return (
     <>
-      {!show && (
+      {!show && joinedGame && (
         <BsReverseLayoutSidebarInsetReverse
           onClick={() => setShow(!show)}
           css={css`
@@ -93,8 +99,12 @@ export const Sidebar: FC<{
                 }
               `}
             >
-              <button onClick={reset}>Reset</button>
-              <button onClick={() => undo()}>Undo</button>
+              {gameType === `local` && (
+                <>
+                  <button onClick={reset}>Reset</button>
+                  <button onClick={() => undo()}>Undo</button>
+                </>
+              )}
             </div>
           </>
         )}

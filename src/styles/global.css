@@ -9,12 +9,28 @@ button {
     cursor: pointer;
     border: none;
     outline: none;
-    padding: 5px;
+    padding: 8px 10px;
     display: flex;
 justify-content: center;
 border-radius: 4px;
+background: #000000;
+
+color: #cfcfcf;
 }
 
 html {
     background-color: black;
 }
+
+input {
+    width: 100%;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #ffffff51;
+    color: white;
+    outline: none;
+  }
+
+  input::placeholder {
+    color: #ffffff98;
+  }
