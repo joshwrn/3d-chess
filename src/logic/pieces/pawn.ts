@@ -1,8 +1,7 @@
-import { useHistoryState } from '@pages/index'
-
 import type { Position, Tile } from '../board'
 import type { Move, MoveFunction, Piece, PieceFactory } from './'
 import { getMove, getBasePiece } from './'
+import { useHistoryState } from '@/state/history'
 
 export function isPawn(value: Pawn | Piece | null): value is Pawn {
   return value?.type === `pawn`

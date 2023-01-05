@@ -8,7 +8,7 @@
   "rules": { 
   "max-len": "off",
   "max-lines": "off",
-  "unused-imports/no-unused-imports-ts": "warn",
+  "unused-imports/no-unused-imports-ts": "off",
   "unused-imports/no-unused-vars-ts": "warn",
   "@typescript-eslint/ban-ts-comment": "off",
   "no-console": "warn",

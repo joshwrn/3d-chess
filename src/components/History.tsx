@@ -3,7 +3,9 @@ import type { FC } from 'react'
 import { css } from '@emotion/react'
 import type { Board, Position } from '@logic/board'
 import type { MoveTypes, Piece } from '@logic/pieces'
-import { useHistoryState } from '@pages/index'
+
+import { useHistoryState } from '@/state/history'
+import { uppercaseFirstLetter } from '@/utils/upperCaseFirstLetter'
 
 export type History = {
   board: Board
@@ -30,10 +32,6 @@ const numberMap: {
   5: `f`,
   6: `g`,
   7: `h`,
-}
-
-const uppercase = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 const getLastFive = (arr: History[]) => {
@@ -74,7 +72,9 @@ export const HistoryPanel: FC = () => {
         const to = convertCoords(h.to.x, h.to.y)
         return (
           <p key={i}>
-            {uppercase(h.piece?.color)} {uppercase(h.piece?.type)}
+            {uppercaseFirstLetter(h.piece?.color)}
+            {` `}
+            {uppercaseFirstLetter(h.piece?.type)}
             <span>
               {` `}from{` `}
             </span>

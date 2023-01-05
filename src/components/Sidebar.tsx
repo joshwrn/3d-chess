@@ -3,38 +3,27 @@ import React from 'react'
 
 import { css } from '@emotion/react'
 import type { Board } from '@logic/board'
-import type { Color, Move, Piece } from '@logic/pieces'
-import { useHistoryState } from '@pages/index'
+import type { Move, Piece } from '@logic/pieces'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
 import { HistoryPanel } from './History'
 import { MiniMap } from './MiniMap'
+import { useGameSettingsState } from '@/state/game'
+import { useHistoryState } from '@/state/history'
+import { usePlayerState } from '@/state/player'
 
 export const Sidebar: FC<{
   board: Board
   moves: Move[]
   selected: Piece | null
-  setTurn: React.Dispatch<React.SetStateAction<Color>>
-  setBoard: (board: Board) => void
-  reset: () => void
-}> = ({ board, moves, selected, reset, setBoard, setTurn }) => {
+}> = ({ board, moves, selected }) => {
   const [show, setShow] = React.useState<boolean>(false)
-  const [history, undoHistory] = useHistoryState((state) => [
-    state.history,
-    state.undo,
-  ])
-  const undo = () => {
-    if (history.length > 0) {
-      const last = history[history.length - 1]
-      setBoard(last.board)
-      setTurn((prev) => (prev === `white` ? `black` : `white`))
-      undoHistory()
-    }
-  }
+  const joinedGame = usePlayerState((state) => state.joinedRoom)
+
   return (
     <>
-      {!show && (
+      {!show && joinedGame && (
         <BsReverseLayoutSidebarInsetReverse
           onClick={() => setShow(!show)}
           css={css`
@@ -80,22 +69,6 @@ export const Sidebar: FC<{
             <AiFillCloseCircle onClick={() => setShow(!show)} />
             <MiniMap board={board} selected={selected} moves={moves} />
             <HistoryPanel />
-            <div
-              css={css`
-                display: flex;
-                gap: 30px;
-                width: 100%;
-                justify-content: center;
-                height: 100%;
-                align-items: flex-end;
-                button {
-                  width: 100%;
-                }
-              `}
-            >
-              <button onClick={reset}>Reset</button>
-              <button onClick={() => undo()}>Undo</button>
-            </div>
           </>
         )}
       </div>
