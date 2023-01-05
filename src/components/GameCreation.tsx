@@ -1,8 +1,9 @@
 import type { FC } from 'react'
 
 import { css } from '@emotion/react'
-import { usePlayerState } from '@pages/index'
 import type { Socket } from 'socket.io-client'
+
+import { usePlayerState } from '@/state/player'
 
 export const GameCreation: FC<{
   socket: Socket

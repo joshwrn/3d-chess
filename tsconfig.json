@@ -26,7 +26,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
-      "@pages/*": ["pages/*"],
+      "@pages/*": ["src/pages/*"],
       "@logic/*": ["src/logic/*"],
       "@models/*": ["src/models/*"],
     }

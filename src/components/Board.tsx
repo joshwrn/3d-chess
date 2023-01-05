@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import type { Position, Tile, Board } from '@logic/board'
 import { copyBoard } from '@logic/board'
-import type { Color, Move, Piece } from '@logic/pieces'
+import type { Move, Piece } from '@logic/pieces'
 import {
   getTile,
   detectGameOver,
@@ -22,12 +22,22 @@ import { PawnModel } from '@models/Pawn'
 import { QueenComponent } from '@models/Queen'
 import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
-import type { GameOver, MovingTo, ThreeMouseEvent } from '@pages/index'
-import { useGameSettingsState, useHistoryState } from '@pages/index'
 import { useSpring, animated } from '@react-spring/three'
 
 import { isKing } from '@/logic/pieces/king'
 import { isRook } from '@/logic/pieces/rook'
+import type { GameOver } from '@/pages/index'
+import { useGameSettingsState } from '@/state/game'
+import { useHistoryState } from '@/state/history'
+
+type ThreeMouseEvent = {
+  stopPropagation: () => void
+}
+
+type MovingTo = {
+  move: Move
+  tile: Tile
+}
 
 export const BoardComponent: FC<{
   selected: Piece | null

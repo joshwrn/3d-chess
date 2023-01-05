@@ -2,8 +2,9 @@ import type { FC } from 'react'
 import React from 'react'
 
 import { css } from '@emotion/react'
-import type { GameOver } from '@pages/index'
 import { VscDebugRestart } from 'react-icons/vsc'
+
+import type { GameOver } from '@/pages/index'
 
 export const GameOverScreen: FC<{
   gameOver: GameOver | null

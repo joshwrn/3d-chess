@@ -4,16 +4,14 @@ import React from 'react'
 import { css } from '@emotion/react'
 import type { Board } from '@logic/board'
 import type { Move, Piece } from '@logic/pieces'
-import {
-  useGameSettingsState,
-  useHistoryState,
-  usePlayerState,
-} from '@pages/index'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
 import { HistoryPanel } from './History'
 import { MiniMap } from './MiniMap'
+import { useGameSettingsState } from '@/state/game'
+import { useHistoryState } from '@/state/history'
+import { usePlayerState } from '@/state/player'
 
 export const Sidebar: FC<{
   board: Board
