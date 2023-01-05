@@ -1,13 +1,16 @@
 import type { FC } from 'react'
 
 import { css } from '@emotion/react'
-import type { Socket } from 'socket.io-client'
 
 import { usePlayerState } from '@/state/player'
+import { useSocketState } from '@/utils/socket'
 
-export const GameCreation: FC<{
-  socket: Socket
-}> = ({ socket }) => {
+export type JoinRoomClient = {
+  room: string
+  username: string
+}
+
+export const GameCreation: FC = () => {
   const { room, username, setJoinedRoom, joinedRoom, setUsername, setRoom } =
     usePlayerState((state) => ({
       room: state.room,
@@ -17,8 +20,13 @@ export const GameCreation: FC<{
       setUsername: state.setUsername,
       setRoom: state.setRoom,
     }))
+  const { socket } = useSocketState((state) => ({
+    socket: state.socket,
+  }))
   const sendRoom = async () => {
-    socket.emit(`joinRoom`, { room, username })
+    if (!socket) return
+    const data: JoinRoomClient = { room, username }
+    socket.emit(`joinRoom`, data)
     socket.emit(`fetchPlayers`, { room })
     setJoinedRoom(true)
   }

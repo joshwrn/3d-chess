@@ -31,12 +31,15 @@ export const Home: FC = () => {
   const [moves, setMoves] = useState<Move[]>([])
   const [gameOver, setGameOver] = useState<GameOver | null>(null)
   const resetHistory = useHistoryState((state) => state.reset)
-  const [resetTurn] = useGameSettingsState((state) => [state.resetTurn])
-  const { totalPlayers } = usePlayerState((state) => ({
-    totalPlayers: state.totalPlayers,
+  const { resetTurn, gameStarted } = useGameSettingsState((state) => ({
+    resetTurn: state.resetTurn,
+    gameStarted: state.gameStarted,
+  }))
+  const { joined } = usePlayerState((state) => ({
+    joined: state.joinedRoom,
   }))
 
-  const socket = useSockets()
+  useSockets()
 
   const reset = () => {
     setBoard(createBoard())
@@ -60,7 +63,7 @@ export const Home: FC = () => {
         flex-direction: column;
       `}
     >
-      <GameCreation socket={socket} />
+      <GameCreation />
       <Sidebar
         board={board}
         moves={moves}
@@ -68,14 +71,14 @@ export const Home: FC = () => {
         reset={reset}
         setBoard={setBoard}
       />
-      <Chat socket={socket} />
+      {joined && <Chat />}
       <StatusBar />
       <GameOverScreen gameOver={gameOver} reset={reset} />
       <Canvas shadows camera={{ position: [-10, 5, 6], fov: 70 }}>
         <OrbitControls
           maxDistance={25}
           minDistance={7}
-          enabled={!gameOver && totalPlayers === 2}
+          enabled={!gameOver && gameStarted}
           enableZoom={true}
           enablePan={false}
         />

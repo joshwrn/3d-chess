@@ -2,13 +2,17 @@ import type { FC } from 'react'
 
 import { css } from '@emotion/react'
 
+import { useGameSettingsState } from '@/state/game'
 import { usePlayerState } from '@/state/player'
 
 export const StatusBar: FC = () => {
-  const { room, totalPlayers, joinedRoom } = usePlayerState((state) => ({
+  const { room, joinedRoom, playerColor } = usePlayerState((state) => ({
     room: state.room,
-    totalPlayers: state.totalPlayers,
     joinedRoom: state.joinedRoom,
+    playerColor: state.playerColor,
+  }))
+  const { gameStarted } = useGameSettingsState((state) => ({
+    gameStarted: state.gameStarted,
   }))
   return (
     <div
@@ -26,8 +30,12 @@ export const StatusBar: FC = () => {
         gap: 20px;
       `}
     >
-      {joinedRoom && <p>{room}</p>}
-      {totalPlayers < 2 && joinedRoom && <p>Waiting for opponent...</p>}
+      {joinedRoom && (
+        <p>
+          room: {room} player: {playerColor}
+        </p>
+      )}
+      {!gameStarted && joinedRoom && <p>Waiting for opponent...</p>}
     </div>
   )
 }

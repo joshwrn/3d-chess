@@ -2,9 +2,10 @@ import type { FC } from 'react'
 import React, { useEffect, useState } from 'react'
 
 import type { Position, Tile, Board } from '@logic/board'
-import { copyBoard } from '@logic/board'
+import { checkIfPositionsMatch, copyBoard } from '@logic/board'
 import type { Move, Piece } from '@logic/pieces'
 import {
+  createId,
   getTile,
   detectGameOver,
   oppositeColor,
@@ -29,14 +30,20 @@ import { isRook } from '@/logic/pieces/rook'
 import type { GameOver } from '@/pages/index'
 import { useGameSettingsState } from '@/state/game'
 import { useHistoryState } from '@/state/history'
+import { usePlayerState } from '@/state/player'
+import { useSocketState } from '@/utils/socket'
 
 type ThreeMouseEvent = {
   stopPropagation: () => void
 }
 
-type MovingTo = {
+export type MovingTo = {
   move: Move
   tile: Tile
+}
+export type MakeMoveClient = {
+  movingTo: MovingTo
+  room: string
 }
 
 export const BoardComponent: FC<{
@@ -57,15 +64,23 @@ export const BoardComponent: FC<{
   setGameOver,
 }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
-  const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [history, setHistory] = useHistoryState((state) => [
     state.history,
     state.addItem,
   ])
-  const [turn, setTurn] = useGameSettingsState((state) => [
-    state.turn,
-    state.setTurn,
-  ])
+  const { playerColor, room } = usePlayerState((state) => ({
+    playerColor: state.playerColor,
+    room: state.room,
+  }))
+  const [turn, setTurn, gameStarted, movingTo, setMovingTo] =
+    useGameSettingsState((state) => [
+      state.turn,
+      state.setTurn,
+      state.gameStarted,
+      state.movingTo,
+      state.setMovingTo,
+    ])
+  const socket = useSocketState((state) => state.socket)
 
   const [redLightPosition, setRedLightPosition] = useState<Position>({
     x: 0,
@@ -74,6 +89,8 @@ export const BoardComponent: FC<{
 
   const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
+    const isPlayersTurn = turn === playerColor
+    if (!isPlayersTurn || !gameStarted) return
     if (!tile?.piece?.type && !selected) return
     if (!tile?.piece) {
       setSelected(null)
@@ -90,10 +107,9 @@ export const BoardComponent: FC<{
   }
 
   const finishMovingPiece = (tile: Tile | null) => {
-    if (!selected) return
-    if (!tile) return
-    if (!movingTo) return
-    setHistory({
+    if (!tile || !movingTo || !socket) return
+    console.log(`finishMovingPiece`)
+    const newHistoryItem = {
       board: copyBoard(board),
       to: movingTo.move.newPosition,
       from: movingTo.move.piece.position,
@@ -101,10 +117,12 @@ export const BoardComponent: FC<{
       capture: movingTo.move.capture,
       type: movingTo.move.type,
       piece: movingTo.move.piece,
-    })
+    }
+    setHistory(newHistoryItem)
     setBoard((prev) => {
       const newBoard = copyBoard(prev)
-      const selectedTile = getTile(newBoard, selected.position)
+      if (!movingTo.move.piece) return prev
+      const selectedTile = getTile(newBoard, movingTo.move.piece.position)
       const tileToMoveTo = getTile(newBoard, tile.position)
       if (!selectedTile || !tileToMoveTo) return prev
 
@@ -170,9 +188,23 @@ export const BoardComponent: FC<{
     }
   }, [board, turn])
 
+  useEffect(() => {
+    console.log({ movingTo })
+  }, [movingTo])
+
   const startMovingPiece = (e: ThreeMouseEvent, tile: Tile, nextTile: Move) => {
     e.stopPropagation()
-    setMovingTo({ move: nextTile, tile: tile })
+    if (!socket) return
+    const newMovingTo = {
+      move: nextTile,
+      tile: tile,
+    }
+    // setMovingTo(newMovingTo)
+    const makeMove: MakeMoveClient = {
+      movingTo: newMovingTo,
+      room: room,
+    }
+    socket.emit(`makeMove`, makeMove)
   }
 
   const { intensity } = useSpring({
@@ -213,12 +245,12 @@ export const BoardComponent: FC<{
 
           const tileId = tile.piece?.getId()
           const pieceIsBeingReplaced =
-            movingTo?.move.piece && tile.piece
-              ? tileId === movingTo?.move.capture?.getId()
+            movingTo?.move.piece && tile.piece && movingTo?.move.capture
+              ? tileId === createId(movingTo?.move.capture)
               : false
           const rookCastled = movingTo?.move.castling?.rook
           const isBeingCastled =
-            rookCastled && rookCastled.getId() === tile.piece?.getId()
+            rookCastled && createId(rookCastled) === tile.piece?.getId()
 
           const handleClick = (e: ThreeMouseEvent) => {
             if (movingTo) {
@@ -249,7 +281,10 @@ export const BoardComponent: FC<{
               : false,
             canMoveHere: canMoveHere?.newPosition ?? null,
             movingTo:
-              isSelected && movingTo
+              checkIfPositionsMatch(
+                tile.position,
+                movingTo?.move.piece?.position,
+              ) && movingTo
                 ? movingTo.move.steps
                 : isBeingCastled
                 ? movingTo.move.castling?.rookSteps ?? null

@@ -25,8 +25,6 @@ export const usePlayerState = create<{
   setJoinedRoom: (joinedRoom: boolean) => void
   playerColor: Color
   setPlayerColor: (color: Color) => void
-  totalPlayers: number
-  setTotalPlayers: (totalPlayers: number) => void
 }>((set) => ({
   username: ``,
   setUsername: (username) => set({ username }),
@@ -36,6 +34,4 @@ export const usePlayerState = create<{
   setJoinedRoom: (joinedRoom) => set({ joinedRoom }),
   playerColor: `white`,
   setPlayerColor: (color: Color) => set({ playerColor: color }),
-  totalPlayers: 0,
-  setTotalPlayers: (totalPlayers) => set({ totalPlayers }),
 }))

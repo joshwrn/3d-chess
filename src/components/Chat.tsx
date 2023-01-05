@@ -2,23 +2,28 @@ import type { FC } from 'react'
 import { useState } from 'react'
 
 import { css } from '@emotion/react'
-import type { Socket } from 'socket.io-client'
 
+import type { Message } from '@/state/player'
 import { useMessageState, usePlayerState } from '@/state/player'
+import { useSocketState } from '@/utils/socket'
 
-export const Chat: FC<{
-  socket: Socket
-}> = ({ socket }) => {
+export type MessageClient = {
+  room: string
+  message: Message
+}
+
+export const Chat: FC = () => {
   const [message, setMessage] = useState(``)
   const [messages] = useMessageState((state) => [state.messages])
   const { room, username } = usePlayerState((state) => ({
     room: state.room,
     username: state.username,
   }))
+  const socket = useSocketState((state) => state.socket)
   const sendMessage = async () => {
-    socket.emit(`createdMessage`, {
+    socket?.emit(`createdMessage`, {
       room: room,
-      msg: { author: username, message },
+      message: { author: username, message },
     })
     setMessage(``)
   }
