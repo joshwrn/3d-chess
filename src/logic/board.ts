@@ -18,14 +18,6 @@ export const createTile = (position: Position, piece?: PieceArgs): Tile => {
   }
 }
 
-export const checkIfPositionsMatch = (
-  pos1?: Position | null,
-  pos2?: Position | null,
-): boolean => {
-  if (!pos1 || !pos2) return false
-  return pos1.x === pos2.x && pos1.y === pos2.y
-}
-
 export const copyBoard = (board: Board): Board => {
   return [
     ...board.map((row) => {

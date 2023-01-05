@@ -310,8 +310,7 @@ export const getFarMoves = ({
   return moves
 }
 
-export const createId = (piece?: PieceArgs | null): string => {
-  if (!piece) return `empty`
+export const createId = (piece: PieceArgs | null): string => {
   return `${piece?.type}-${piece?.color}-${piece?.id}`
 }
 
