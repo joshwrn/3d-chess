@@ -1,30 +1,44 @@
 import type { FC } from 'react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
+import { BoardComponent } from '@components/Board'
+import { GameOverScreen } from '@components/GameOverScreen'
+import type { History } from '@components/History'
+import { Sidebar } from '@components/Sidebar'
 import { css } from '@emotion/react'
-import type { Board } from '@logic/board'
+import type { Board, Tile } from '@logic/board'
 import { createBoard } from '@logic/board'
 import type { Color, GameOverType, Move, Piece } from '@logic/pieces'
-import { Environment, OrbitControls, useProgress } from '@react-three/drei'
+import { Border } from '@models/Border'
+import { Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import create from 'zustand'
 
-import { BoardComponent } from '@/components/Board'
-import { Chat } from '@/components/Chat'
-import { GameCreation } from '@/components/GameCreation'
-import { GameOverScreen } from '@/components/GameOverScreen'
 import { Loader } from '@/components/Loader'
-import { Sidebar } from '@/components/Sidebar'
-import { StatusBar } from '@/components/StatusBar'
-import { Border } from '@/models/Border'
-import { useGameSettingsState } from '@/state/game'
-import { useHistoryState } from '@/state/history'
-import { usePlayerState } from '@/state/player'
-import { useSockets } from '@/utils/socket'
 
+export type ThreeMouseEvent = {
+  stopPropagation: () => void
+}
+export type MovingTo = {
+  move: Move
+  tile: Tile
+}
 export type GameOver = {
   type: GameOverType
   winner: Color
 }
+
+export const useHistoryState = create<{
+  history: History[]
+  reset: VoidFunction
+  addItem: (item: History) => void
+  undo: VoidFunction
+}>((set) => ({
+  history: [] as History[],
+  reset: () => set({ history: [] }),
+  addItem: (item) => set((state) => ({ history: [...state.history, item] })),
+  undo: () => set((state) => ({ history: state.history.slice(0, -1) })),
+}))
 
 export const Home: FC = () => {
   const [board, setBoard] = useState<Board>(createBoard())
@@ -32,30 +46,16 @@ export const Home: FC = () => {
   const [moves, setMoves] = useState<Move[]>([])
   const [gameOver, setGameOver] = useState<GameOver | null>(null)
   const resetHistory = useHistoryState((state) => state.reset)
-  const { resetTurn } = useGameSettingsState((state) => ({
-    resetTurn: state.resetTurn,
-    gameStarted: state.gameStarted,
-  }))
-  const { joined } = usePlayerState((state) => ({
-    joined: state.joinedRoom,
-  }))
+  const [turn, setTurn] = useState<Color>(`white`)
 
   const reset = () => {
     setBoard(createBoard())
     setSelected(null)
     setMoves([])
     resetHistory()
-    resetTurn()
+    setTurn(`white`)
     setGameOver(null)
   }
-
-  useSockets({ reset })
-
-  const [total, setTotal] = useState(0)
-  const { progress } = useProgress()
-  useEffect(() => {
-    setTotal(progress)
-  }, [progress])
 
   return (
     <div
@@ -70,18 +70,22 @@ export const Home: FC = () => {
         flex-direction: column;
       `}
     >
-      {total === 100 ? <GameCreation /> : <Loader />}
-      <Sidebar board={board} moves={moves} selected={selected} />
-      {joined && <Chat />}
-      <StatusBar />
-      <GameOverScreen gameOver={gameOver} />
-      <Canvas shadows camera={{ position: [-12, 5, 6], fov: 50 }}>
+      <Sidebar
+        board={board}
+        moves={moves}
+        selected={selected}
+        reset={reset}
+        setBoard={setBoard}
+        setTurn={setTurn}
+      />
+      <GameOverScreen gameOver={gameOver} reset={reset} />
+      <Loader />
+      <Canvas shadows camera={{ position: [-10, 5, 6], fov: 70 }}>
         <OrbitControls
           maxDistance={25}
           minDistance={7}
-          enabled={!gameOver && joined}
+          enabled={!gameOver}
           enableZoom={true}
-          enablePan={false}
         />
         <Environment preset="dawn" />
         <Border />
@@ -93,6 +97,8 @@ export const Home: FC = () => {
           moves={moves}
           setMoves={setMoves}
           setGameOver={setGameOver}
+          turn={turn}
+          setTurn={setTurn}
         />
       </Canvas>
     </div>

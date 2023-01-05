@@ -58,6 +58,7 @@ export const MeshWrapper: FC<ModelProps> = ({
 }) => {
   const ref = useRef(null)
   const meshRef = useRef(null)
+
   return (
     <group ref={ref} {...props} dispose={null} castShadow>
       <motion.mesh
@@ -68,7 +69,7 @@ export const MeshWrapper: FC<ModelProps> = ({
         initial={false}
         animate={
           movingTo
-            ? variants.move({ movingTo, isSelected: true })
+            ? variants.move({ movingTo, isSelected })
             : pieceIsBeingReplaced
             ? variants.replace({ movingTo, isSelected })
             : isSelected

@@ -2,10 +2,9 @@ import type { FC } from 'react'
 import React, { useEffect, useState } from 'react'
 
 import type { Position, Tile, Board } from '@logic/board'
-import { checkIfPositionsMatch, copyBoard } from '@logic/board'
-import type { Move, Piece } from '@logic/pieces'
+import { copyBoard } from '@logic/board'
+import type { Color, Move, Piece } from '@logic/pieces'
 import {
-  createId,
   getTile,
   detectGameOver,
   oppositeColor,
@@ -23,28 +22,12 @@ import { PawnModel } from '@models/Pawn'
 import { QueenComponent } from '@models/Queen'
 import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
+import type { GameOver, MovingTo, ThreeMouseEvent } from '@pages/index'
+import { useHistoryState } from '@pages/index'
 import { useSpring, animated } from '@react-spring/three'
 
 import { isKing } from '@/logic/pieces/king'
 import { isRook } from '@/logic/pieces/rook'
-import type { GameOver } from '@/pages/index'
-import { useGameSettingsState } from '@/state/game'
-import { useHistoryState } from '@/state/history'
-import { usePlayerState } from '@/state/player'
-import { useSocketState } from '@/utils/socket'
-
-type ThreeMouseEvent = {
-  stopPropagation: () => void
-}
-
-export type MovingTo = {
-  move: Move
-  tile: Tile
-}
-export type MakeMoveClient = {
-  movingTo: MovingTo
-  room: string
-}
 
 export const BoardComponent: FC<{
   selected: Piece | null
@@ -54,6 +37,8 @@ export const BoardComponent: FC<{
   moves: Move[]
   setGameOver: (gameOver: GameOver | null) => void
   setMoves: (moves: Move[]) => void
+  turn: Color
+  setTurn: React.Dispatch<React.SetStateAction<Color>>
 }> = ({
   selected,
   setSelected,
@@ -62,25 +47,15 @@ export const BoardComponent: FC<{
   moves,
   setMoves,
   setGameOver,
+  turn,
+  setTurn,
 }) => {
   const [lastSelected, setLastSelected] = useState<Tile | null>(null)
+  const [movingTo, setMovingTo] = useState<MovingTo | null>(null)
   const [history, setHistory] = useHistoryState((state) => [
     state.history,
     state.addItem,
   ])
-  const { playerColor, room } = usePlayerState((state) => ({
-    playerColor: state.playerColor,
-    room: state.room,
-  }))
-  const [turn, setTurn, gameStarted, movingTo, setMovingTo] =
-    useGameSettingsState((state) => [
-      state.turn,
-      state.setTurn,
-      state.gameStarted,
-      state.movingTo,
-      state.setMovingTo,
-    ])
-  const socket = useSocketState((state) => state.socket)
 
   const [redLightPosition, setRedLightPosition] = useState<Position>({
     x: 0,
@@ -89,8 +64,6 @@ export const BoardComponent: FC<{
 
   const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
-    const isPlayersTurn = turn === playerColor
-    if (!isPlayersTurn || !gameStarted) return
     if (!tile?.piece?.type && !selected) return
     if (!tile?.piece) {
       setSelected(null)
@@ -107,8 +80,10 @@ export const BoardComponent: FC<{
   }
 
   const finishMovingPiece = (tile: Tile | null) => {
-    if (!tile || !movingTo || !socket) return
-    const newHistoryItem = {
+    if (!selected) return
+    if (!tile) return
+    if (!movingTo) return
+    setHistory({
       board: copyBoard(board),
       to: movingTo.move.newPosition,
       from: movingTo.move.piece.position,
@@ -116,12 +91,10 @@ export const BoardComponent: FC<{
       capture: movingTo.move.capture,
       type: movingTo.move.type,
       piece: movingTo.move.piece,
-    }
-    setHistory(newHistoryItem)
+    })
     setBoard((prev) => {
       const newBoard = copyBoard(prev)
-      if (!movingTo.move.piece) return prev
-      const selectedTile = getTile(newBoard, movingTo.move.piece.position)
+      const selectedTile = getTile(newBoard, selected.position)
       const tileToMoveTo = getTile(newBoard, tile.position)
       if (!selectedTile || !tileToMoveTo) return prev
 
@@ -172,7 +145,7 @@ export const BoardComponent: FC<{
       return newBoard
     })
 
-    setTurn()
+    setTurn((prev) => oppositeColor(prev))
 
     setMovingTo(null)
     setMoves([])
@@ -189,16 +162,7 @@ export const BoardComponent: FC<{
 
   const startMovingPiece = (e: ThreeMouseEvent, tile: Tile, nextTile: Move) => {
     e.stopPropagation()
-    if (!socket) return
-    const newMovingTo: MovingTo = {
-      move: nextTile,
-      tile: tile,
-    }
-    const makeMove: MakeMoveClient = {
-      movingTo: newMovingTo,
-      room: room,
-    }
-    socket.emit(`makeMove`, makeMove)
+    setMovingTo({ move: nextTile, tile: tile })
   }
 
   const { intensity } = useSpring({
@@ -206,7 +170,11 @@ export const BoardComponent: FC<{
   })
 
   return (
-    <group position={[-3.5, -0.5, -3.5]}>
+    <group position={[-4, -0.5, -4]}>
+      {/* <mesh position={[3.5, 5, 3.5]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="#d886b7" />
+      </mesh> */}
       <pointLight
         shadow-mapSize={[2048, 2048]}
         castShadow
@@ -235,12 +203,12 @@ export const BoardComponent: FC<{
 
           const tileId = tile.piece?.getId()
           const pieceIsBeingReplaced =
-            movingTo?.move.piece && tile.piece && movingTo?.move.capture
-              ? tileId === createId(movingTo?.move.capture)
+            movingTo?.move.piece && tile.piece
+              ? tileId === movingTo?.move.capture?.getId()
               : false
           const rookCastled = movingTo?.move.castling?.rook
           const isBeingCastled =
-            rookCastled && createId(rookCastled) === tile.piece?.getId()
+            rookCastled && rookCastled.getId() === tile.piece?.getId()
 
           const handleClick = (e: ThreeMouseEvent) => {
             if (movingTo) {
@@ -271,10 +239,7 @@ export const BoardComponent: FC<{
               : false,
             canMoveHere: canMoveHere?.newPosition ?? null,
             movingTo:
-              checkIfPositionsMatch(
-                tile.position,
-                movingTo?.move.piece?.position,
-              ) && movingTo
+              isSelected && movingTo
                 ? movingTo.move.steps
                 : isBeingCastled
                 ? movingTo.move.castling?.rookSteps ?? null
