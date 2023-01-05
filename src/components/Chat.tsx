@@ -45,10 +45,10 @@ export const Chat: FC = () => {
         bottom: 0;
         right: 0;
         width: 270px;
-        height: 190px;
+        max-height: 178px;
         border-radius: 10px;
         backdrop-filter: blur(10px);
-        padding: 10px;
+        padding: 15px 10px 10px 10px;
         overflow-y: hidden;
         z-index: 100;
         color: white;
@@ -59,9 +59,11 @@ export const Chat: FC = () => {
           display: flex;
           flex-direction: column;
           height: 100%;
-          overflow-y: hidden;
           position: relative;
+          overflow-y: hidden;
+          // breaks overflow-y: scroll
           justify-content: flex-end;
+          padding: 0 15px;
         `}
       >
         {messages.map((msg, i) => {
@@ -91,7 +93,13 @@ export const Chat: FC = () => {
           display: flex;
           width: 100%;
           justify-content: space-between;
-          gap: 40px;
+          gap: 0px;
+          border: 1px solid #ffffff12;
+          margin: 10px 0 0 0;
+          input {
+            border: none;
+            padding: 0 15px;
+          }
         `}
       >
         <input

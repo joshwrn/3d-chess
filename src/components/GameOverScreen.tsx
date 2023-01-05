@@ -1,15 +1,18 @@
 import type { FC } from 'react'
-import React from 'react'
 
 import { css } from '@emotion/react'
 import { VscDebugRestart } from 'react-icons/vsc'
 
 import type { GameOver } from '@/pages/index'
+import { useSocketState } from '@/utils/socket'
 
 export const GameOverScreen: FC<{
   gameOver: GameOver | null
-  reset: () => void
-}> = ({ gameOver, reset }) => {
+}> = ({ gameOver }) => {
+  const socket = useSocketState((state) => state.socket)
+  const reset = () => {
+    socket?.emit(`reset`)
+  }
   return (
     <>
       {gameOver && (

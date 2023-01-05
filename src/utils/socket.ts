@@ -22,7 +22,7 @@ export const useSocketState = create<{
   setSocket: (socket) => set({ socket }),
 }))
 
-export const useSockets = (): void => {
+export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
   const [addMessage] = useMessageState((state) => [state.addMessage])
   const { setGameStarted, setMovingTo } = useGameSettingsState((state) => ({
     setGameStarted: state.setGameStarted,
@@ -38,6 +38,12 @@ export const useSockets = (): void => {
   }))
   useEffect(() => {
     socketInitializer()
+
+    return () => {
+      if (socketState) {
+        socketState.disconnect()
+      }
+    }
   }, [])
 
   const socketInitializer = async () => {
@@ -61,8 +67,11 @@ export const useSockets = (): void => {
     })
 
     socket.on(`moveMade`, (data: MovingTo) => {
-      console.log(`move made ${data.move.piece.color}`)
       setMovingTo(data)
+    })
+
+    socket.on(`resetGame`, () => {
+      reset()
     })
 
     socket.on(`playersInRoom`, (data: number) => {

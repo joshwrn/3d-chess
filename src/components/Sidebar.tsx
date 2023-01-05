@@ -17,25 +17,10 @@ export const Sidebar: FC<{
   board: Board
   moves: Move[]
   selected: Piece | null
-  setBoard: (board: Board) => void
-  reset: () => void
-}> = ({ board, moves, selected, reset, setBoard }) => {
+}> = ({ board, moves, selected }) => {
   const [show, setShow] = React.useState<boolean>(false)
-  const setTurn = useGameSettingsState((state) => state.setTurn)
   const joinedGame = usePlayerState((state) => state.joinedRoom)
-  const [history, undoHistory] = useHistoryState((state) => [
-    state.history,
-    state.undo,
-  ])
-  const gameType = useGameSettingsState((state) => state.gameType)
-  const undo = () => {
-    if (history.length > 0) {
-      const last = history[history.length - 1]
-      setBoard(last.board)
-      setTurn()
-      undoHistory()
-    }
-  }
+
   return (
     <>
       {!show && joinedGame && (
@@ -84,26 +69,6 @@ export const Sidebar: FC<{
             <AiFillCloseCircle onClick={() => setShow(!show)} />
             <MiniMap board={board} selected={selected} moves={moves} />
             <HistoryPanel />
-            <div
-              css={css`
-                display: flex;
-                gap: 30px;
-                width: 100%;
-                justify-content: center;
-                height: 100%;
-                align-items: flex-end;
-                button {
-                  width: 100%;
-                }
-              `}
-            >
-              {gameType === `local` && (
-                <>
-                  <button onClick={reset}>Reset</button>
-                  <button onClick={() => undo()}>Undo</button>
-                </>
-              )}
-            </div>
           </>
         )}
       </div>

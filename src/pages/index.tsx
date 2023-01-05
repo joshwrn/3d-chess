@@ -1,17 +1,18 @@
 import type { FC } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { css } from '@emotion/react'
 import type { Board } from '@logic/board'
 import { createBoard } from '@logic/board'
 import type { Color, GameOverType, Move, Piece } from '@logic/pieces'
-import { Environment, OrbitControls } from '@react-three/drei'
+import { Environment, OrbitControls, useProgress } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 
 import { BoardComponent } from '@/components/Board'
 import { Chat } from '@/components/Chat'
 import { GameCreation } from '@/components/GameCreation'
 import { GameOverScreen } from '@/components/GameOverScreen'
+import { Loader } from '@/components/Loader'
 import { Sidebar } from '@/components/Sidebar'
 import { StatusBar } from '@/components/StatusBar'
 import { Border } from '@/models/Border'
@@ -39,8 +40,6 @@ export const Home: FC = () => {
     joined: state.joinedRoom,
   }))
 
-  useSockets()
-
   const reset = () => {
     setBoard(createBoard())
     setSelected(null)
@@ -49,6 +48,14 @@ export const Home: FC = () => {
     resetTurn()
     setGameOver(null)
   }
+
+  useSockets({ reset })
+
+  const [total, setTotal] = useState(0)
+  const { progress } = useProgress()
+  useEffect(() => {
+    setTotal(progress)
+  }, [progress])
 
   return (
     <div
@@ -63,18 +70,12 @@ export const Home: FC = () => {
         flex-direction: column;
       `}
     >
-      <GameCreation />
-      <Sidebar
-        board={board}
-        moves={moves}
-        selected={selected}
-        reset={reset}
-        setBoard={setBoard}
-      />
+      {total === 100 ? <GameCreation /> : <Loader />}
+      <Sidebar board={board} moves={moves} selected={selected} />
       {joined && <Chat />}
       <StatusBar />
-      <GameOverScreen gameOver={gameOver} reset={reset} />
-      <Canvas shadows camera={{ position: [-10, 5, 6], fov: 70 }}>
+      <GameOverScreen gameOver={gameOver} />
+      <Canvas shadows camera={{ position: [-12, 5, 6], fov: 50 }}>
         <OrbitControls
           maxDistance={25}
           minDistance={7}

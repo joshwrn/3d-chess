@@ -46,7 +46,9 @@ export const StatusBar: FC = () => {
           <span>{uppercaseFirstLetter(turn)}</span>
         </p>
       )}
-      {!gameStarted && joinedRoom && <p>Waiting for opponent...</p>}
+      {!gameStarted && joinedRoom && (
+        <p>Share your room name to invite another player.</p>
+      )}
     </div>
   )
 }
