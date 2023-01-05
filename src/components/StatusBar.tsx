@@ -4,6 +4,7 @@ import { css } from '@emotion/react'
 
 import { useGameSettingsState } from '@/state/game'
 import { usePlayerState } from '@/state/player'
+import { uppercaseFirstLetter } from '@/utils/upperCaseFirstLetter'
 
 export const StatusBar: FC = () => {
   const { room, joinedRoom, playerColor } = usePlayerState((state) => ({
@@ -11,8 +12,9 @@ export const StatusBar: FC = () => {
     joinedRoom: state.joinedRoom,
     playerColor: state.playerColor,
   }))
-  const { gameStarted } = useGameSettingsState((state) => ({
+  const { gameStarted, turn } = useGameSettingsState((state) => ({
     gameStarted: state.gameStarted,
+    turn: state.turn,
   }))
   return (
     <div
@@ -22,17 +24,26 @@ export const StatusBar: FC = () => {
         left: 50%;
         transform: translateX(-50%);
         color: #ffffff8d;
-        font-size: 20px;
+        font-size: 14px;
         z-index: 100;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 20px;
+        span {
+          color: #ffffffba;
+          font-weight: 600;
+        }
       `}
     >
       {joinedRoom && (
         <p>
-          room: {room} player: {playerColor}
+          Room{` `}
+          <span>{room}</span>
+          {` | `}Player{` `}
+          <span>{uppercaseFirstLetter(playerColor)}</span>
+          {` | `}Turn{` `}
+          <span>{uppercaseFirstLetter(turn)}</span>
         </p>
       )}
       {!gameStarted && joinedRoom && <p>Waiting for opponent...</p>}

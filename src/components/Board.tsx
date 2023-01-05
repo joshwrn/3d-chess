@@ -108,7 +108,6 @@ export const BoardComponent: FC<{
 
   const finishMovingPiece = (tile: Tile | null) => {
     if (!tile || !movingTo || !socket) return
-    console.log(`finishMovingPiece`)
     const newHistoryItem = {
       board: copyBoard(board),
       to: movingTo.move.newPosition,
@@ -188,18 +187,13 @@ export const BoardComponent: FC<{
     }
   }, [board, turn])
 
-  useEffect(() => {
-    console.log({ movingTo })
-  }, [movingTo])
-
   const startMovingPiece = (e: ThreeMouseEvent, tile: Tile, nextTile: Move) => {
     e.stopPropagation()
     if (!socket) return
-    const newMovingTo = {
+    const newMovingTo: MovingTo = {
       move: nextTile,
       tile: tile,
     }
-    // setMovingTo(newMovingTo)
     const makeMove: MakeMoveClient = {
       movingTo: newMovingTo,
       room: room,
@@ -212,11 +206,7 @@ export const BoardComponent: FC<{
   })
 
   return (
-    <group position={[-4, -0.5, -4]}>
-      {/* <mesh position={[3.5, 5, 3.5]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#d886b7" />
-      </mesh> */}
+    <group position={[-3.5, -0.5, -3.5]}>
       <pointLight
         shadow-mapSize={[2048, 2048]}
         castShadow

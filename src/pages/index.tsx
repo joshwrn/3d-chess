@@ -31,7 +31,7 @@ export const Home: FC = () => {
   const [moves, setMoves] = useState<Move[]>([])
   const [gameOver, setGameOver] = useState<GameOver | null>(null)
   const resetHistory = useHistoryState((state) => state.reset)
-  const { resetTurn, gameStarted } = useGameSettingsState((state) => ({
+  const { resetTurn } = useGameSettingsState((state) => ({
     resetTurn: state.resetTurn,
     gameStarted: state.gameStarted,
   }))
@@ -78,7 +78,7 @@ export const Home: FC = () => {
         <OrbitControls
           maxDistance={25}
           minDistance={7}
-          enabled={!gameOver && gameStarted}
+          enabled={!gameOver && joined}
           enableZoom={true}
           enablePan={false}
         />

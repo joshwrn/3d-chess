@@ -58,13 +58,6 @@ export const MeshWrapper: FC<ModelProps> = ({
 }) => {
   const ref = useRef(null)
   const meshRef = useRef(null)
-  movingTo &&
-    console.log(`model wrapper`, {
-      movingTo,
-      isSelected,
-      pieceIsBeingReplaced,
-      wasSelected,
-    })
   return (
     <group ref={ref} {...props} dispose={null} castShadow>
       <motion.mesh
@@ -95,7 +88,6 @@ export const MeshWrapper: FC<ModelProps> = ({
         }
         onAnimationComplete={() => {
           if (movingTo) {
-            console.log(`wtf`)
             finishMovingPiece()
           }
         }}
@@ -170,14 +162,11 @@ export const variants: {
     y: isSelected ? 1.4 : 0,
     z: 0,
   }),
-  move: ({ movingTo }: VariantProps) => {
-    console.log(`tf`, movingTo)
-    return {
-      x: getDistance(movingTo?.x),
-      y: [1.4, 1.6, 0],
-      z: getDistance(movingTo?.y),
-    }
-  },
+  move: ({ movingTo }: VariantProps) => ({
+    x: getDistance(movingTo?.x),
+    y: [1.4, 1.6, 0],
+    z: getDistance(movingTo?.y),
+  }),
   replace: () => ({
     y: 20,
     x: 5 * randomNegative(),

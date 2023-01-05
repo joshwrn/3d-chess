@@ -15,7 +15,7 @@ export const useGameSettingsState = create<{
   movingTo: MovingTo | null
   setMovingTo: (move: MovingTo | null) => void
 }>((set) => ({
-  gameType: `local`,
+  gameType: `online`,
   setGameType: (type) => set({ gameType: type }),
   turn: `white`,
   setTurn: () => set((state) => ({ turn: oppositeColor(state.turn) })),
