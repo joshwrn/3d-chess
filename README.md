@@ -1,3 +1,5 @@
-Fully playable game of chess built with react three fiber.
+Multiplayer 3d chess game built with react-three-fiber and socket.io.
 
-Live demo: https://3d-chess-five.vercel.app/
+Live demo: https://chess-in-3d.herokuapp.com/
+
+![Imgur](https://i.imgur.com/r9tBfim.png)
