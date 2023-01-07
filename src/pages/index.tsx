@@ -6,13 +6,14 @@ import type { Board } from '@logic/board'
 import { createBoard } from '@logic/board'
 import type { Color, GameOverType, Move, Piece } from '@logic/pieces'
 import { Environment, OrbitControls, useProgress } from '@react-three/drei'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 
 import { BoardComponent } from '@/components/Board'
 import { Chat } from '@/components/Chat'
 import { GameCreation } from '@/components/GameCreation'
 import { GameOverScreen } from '@/components/GameOverScreen'
 import { Loader } from '@/components/Loader'
+import { Opponent } from '@/components/Opponent'
 import { Sidebar } from '@/components/Sidebar'
 import { StatusBar } from '@/components/StatusBar'
 import { Border } from '@/models/Border'
@@ -75,15 +76,9 @@ export const Home: FC = () => {
       {joined && <Chat />}
       <StatusBar />
       <GameOverScreen gameOver={gameOver} />
-      <Canvas shadows camera={{ position: [-12, 5, 6], fov: 50 }}>
-        <OrbitControls
-          maxDistance={25}
-          minDistance={7}
-          enabled={!gameOver && joined}
-          enableZoom={true}
-          enablePan={false}
-        />
-        <Environment preset="dawn" />
+      <Canvas shadows>
+        <Environment preset="city" />
+        <Opponent />
         <Border />
         <BoardComponent
           selected={selected}

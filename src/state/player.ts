@@ -16,6 +16,22 @@ export const useMessageState = create<{
     set((state) => ({ messages: [...state.messages, message] })),
 }))
 
+export const useOpponentState = create<{
+  position: [number, number, number]
+  rotation: [number, number, number]
+  mousePosition: [number, number, number]
+  setPosition: (position: [number, number, number]) => void
+  setRotation: (rotation: [number, number, number]) => void
+  setMousePosition: (mousePosition: [number, number, number]) => void
+}>((set) => ({
+  position: [0, 0, 0],
+  rotation: [0, 0, 0],
+  setPosition: (position) => set({ position }),
+  setRotation: (rotation) => set({ rotation }),
+  mousePosition: [0, 0, 0],
+  setMousePosition: (mousePosition) => set({ mousePosition }),
+}))
+
 export const usePlayerState = create<{
   username: string
   setUsername: (username: string) => void

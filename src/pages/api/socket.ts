@@ -16,6 +16,13 @@ export type playerJoinedServer = {
   playerCount: number
 }
 
+export type CameraMove = {
+  position: [number, number, number]
+  rotation: [number, number, number]
+  room: string
+  color: Color
+}
+
 export default function SocketHandler(
   req: NextApiRequest,
   res: NextApiResponse & {
@@ -60,6 +67,10 @@ export default function SocketHandler(
 
     socket.on(`makeMove`, (data: MakeMoveClient) => {
       io.sockets.in(data.room).emit(`moveMade`, data.movingTo)
+    })
+
+    socket.on(`cameraMove`, (data: CameraMove) => {
+      io.sockets.in(data.room).emit(`cameraMoved`, data)
     })
 
     socket.on(`fetchPlayers`, (data: { room: string }) => {

@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import React, { useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 
 import type { Position, Tile, Board } from '@logic/board'
 import { checkIfPositionsMatch, copyBoard } from '@logic/board'
@@ -24,13 +24,23 @@ import { QueenComponent } from '@models/Queen'
 import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
 import { useSpring, animated } from '@react-spring/three'
+import {
+  Line,
+  OrbitControls,
+  OrbitControlsProps,
+  PerspectiveCamera,
+} from '@react-three/drei'
+import type { Vector3 } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
+import * as THREE from 'three'
 
 import { isKing } from '@/logic/pieces/king'
 import { isRook } from '@/logic/pieces/rook'
+import type { CameraMove } from '@/pages/api/socket'
 import type { GameOver } from '@/pages/index'
 import { useGameSettingsState } from '@/state/game'
 import { useHistoryState } from '@/state/history'
-import { usePlayerState } from '@/state/player'
+import { useOpponentState, usePlayerState } from '@/state/player'
 import { useSocketState } from '@/utils/socket'
 
 type ThreeMouseEvent = {
@@ -44,6 +54,24 @@ export type MovingTo = {
 export type MakeMoveClient = {
   movingTo: MovingTo
   room: string
+}
+
+function LineComp(props: any) {
+  const ref = useRef<any>()
+
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.geometry.setFromPoints(
+        [props.start, props.end].map((point) => new THREE.Vector3(...point)),
+      )
+    }
+  })
+  return (
+    <line ref={ref}>
+      <bufferGeometry />
+      <lineBasicMaterial color="hotpink" />
+    </line>
+  )
 }
 
 export const BoardComponent: FC<{
@@ -205,8 +233,54 @@ export const BoardComponent: FC<{
     intensity: selected ? 0.35 : 0,
   })
 
+  const orbitRef = useRef<any>(null)
+
+  const { get, camera, pointer, mouse } = useThree()
+
+  const [ownPosition, setOwnPosition] = useState<{
+    position: [number, number, number]
+    rotation: [number, number, number]
+  }>({
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+  })
+
+  useFrame(() => {
+    if (orbitRef.current.position0) {
+      // just don't send if position hasn't changed
+      const { x, y, z } = camera.position
+      if (
+        x === ownPosition.position[0] &&
+        y === ownPosition.position[1] &&
+        z === ownPosition.position[2]
+      ) {
+        return
+      }
+      const { x: rx, y: ry, z: rz } = camera.rotation
+
+      setOwnPosition({
+        position: [x, y, z],
+        rotation: [rx, ry, rz],
+      })
+
+      socket?.emit(`cameraMove`, {
+        position: [x, y, z],
+        rotation: [rx, ry, rz],
+        room: room,
+        color: playerColor,
+      } satisfies CameraMove)
+    }
+  })
+
   return (
     <group position={[-3.5, -0.5, -3.5]}>
+      <OrbitControls
+        maxDistance={25}
+        minDistance={7}
+        enableZoom={true}
+        enablePan={false}
+        ref={orbitRef}
+      />
       <pointLight
         shadow-mapSize={[2048, 2048]}
         castShadow
@@ -214,6 +288,20 @@ export const BoardComponent: FC<{
         intensity={0.65}
         color="#ffe0ec"
       />
+      {/* <LineComp start={position} end={mousePosition} /> */}
+      {/* <Line
+        points={[[...mousePosition], position]} // Array of points, Array<Vector3 | Vector2 | [number, number, number] | [number, number] | number>
+        color={0x0000ff} // Default
+        lineWidth={10} // In pixels (default)
+      /> */}
+      <pointLight
+        castShadow
+        intensity={0.5}
+        color={`#0091ff`}
+        position={ownPosition.position}
+        rotation={ownPosition.rotation}
+      />
+
       <hemisphereLight intensity={0.5} color="#ffa4a4" groundColor="#d886b7" />
       {/* @ts-ignore */}
       <animated.pointLight

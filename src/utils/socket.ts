@@ -7,10 +7,14 @@ import io from 'socket.io-client'
 import create from 'zustand'
 
 import type { MovingTo } from '@/components/Board'
-import type { playerJoinedServer } from '@/pages/api/socket'
+import type { CameraMove, playerJoinedServer } from '@/pages/api/socket'
 import { useGameSettingsState } from '@/state/game'
 import type { Message } from '@/state/player'
-import { usePlayerState, useMessageState } from '@/state/player'
+import {
+  useOpponentState,
+  usePlayerState,
+  useMessageState,
+} from '@/state/player'
 
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>
 
@@ -31,6 +35,10 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
   const { setPlayerColor } = usePlayerState((state) => ({
     setPlayerColor: state.setPlayerColor,
   }))
+
+  const { setPosition, setRotation, setMousePosition } = useOpponentState(
+    (state) => state,
+  )
 
   const { socket: socketState, setSocket } = useSocketState((state) => ({
     socket: state.socket,
@@ -64,6 +72,15 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
       if (data.username === username) {
         setPlayerColor(data.color)
       }
+    })
+
+    socket.on(`cameraMoved`, (data: CameraMove) => {
+      const { playerColor } = usePlayerState.getState()
+      if (playerColor === data.color) {
+        return
+      }
+      setPosition(data.position)
+      setRotation(data.rotation)
     })
 
     socket.on(`moveMade`, (data: MovingTo) => {
