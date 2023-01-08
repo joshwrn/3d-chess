@@ -3,11 +3,14 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Socket, ServerOptions } from 'socket.io'
 import { Server } from 'socket.io'
 
-import type { MakeMoveClient } from '@/components/Board'
-import type { MessageClient } from '@/components/Chat'
-import type { JoinRoomClient } from '@/components/GameCreation'
 import type { Color } from '@/logic/pieces'
-import type { Message } from '@/state/player'
+import { cameraMove } from '@/server/cameraMove'
+import { disconnect } from '@/server/disconnect'
+import { fetchPlayers } from '@/server/fetchPlayers'
+import { joinRoom } from '@/server/joinRoom'
+import { makeMove } from '@/server/makeMove'
+import { resetGame } from '@/server/resetGame'
+import { sendMessage } from '@/server/sendMessage'
 
 export type playerJoinedServer = {
   room: string
@@ -16,12 +19,32 @@ export type playerJoinedServer = {
   playerCount: number
 }
 
-export type CameraMove = {
-  position: [number, number, number]
-  rotation: [number, number, number]
-  room: string
-  color: Color
+export const socketOnEvents = [
+  `createdMessage`,
+  `joinRoom`,
+  `makeMove`,
+  `cameraMove`,
+  `fetchPlayers`,
+  `resetGame`,
+  `disconnect`,
+] as const
+export type SocketOnEvents = typeof socketOnEvents[number]
+interface On {
+  on: (event: SocketOnEvents, callback: (data: any) => void) => void
 }
+export const socketEmitEvents = [
+  `newIncomingMessage`,
+  `playerJoined`,
+  `moveMade`,
+  `cameraMoved`,
+  `playersInRoom`,
+  `gameReset`,
+  `newError`,
+  `joinRoom`,
+  `playerLeft`,
+] as const
+export type SocketEmitEvents = typeof socketEmitEvents[number]
+export type MySocket = Omit<Socket, `on`> & On
 
 export default function SocketHandler(
   req: NextApiRequest,
@@ -33,7 +56,7 @@ export default function SocketHandler(
     }
   },
 ): void {
-  // It means that socket server was already initialised
+  // It means that socket server was already initialized
   if (res?.socket?.server?.io) {
     console.log(`Already set up`)
     res.end()
@@ -43,49 +66,14 @@ export default function SocketHandler(
   const io = new Server(res?.socket?.server)
   res.socket.server.io = io
 
-  const onConnection = (socket: Socket) => {
-    socket.on(`createdMessage`, (data: MessageClient) => {
-      const send: Message = data.message
-      io.sockets.in(data.room).emit(`newIncomingMessage`, send)
-    })
-
-    socket.on(`joinRoom`, (data: JoinRoomClient) => {
-      const { room, username } = data
-      socket.join(room)
-
-      const playerCount = io.sockets.adapter.rooms.get(data.room)?.size || 0
-      if (playerCount > 2) {
-        socket.emit(`newError`, `Room is full`)
-        return
-      }
-      const color: Color = playerCount === 2 ? `black` : `white`
-      const props: playerJoinedServer = { room, username, color, playerCount }
-      io.sockets.in(room).emit(`playerJoined`, props)
-
-      console.log(`join room ${room}`)
-    })
-
-    socket.on(`makeMove`, (data: MakeMoveClient) => {
-      io.sockets.in(data.room).emit(`moveMade`, data.movingTo)
-    })
-
-    socket.on(`cameraMove`, (data: CameraMove) => {
-      io.sockets.in(data.room).emit(`cameraMoved`, data)
-    })
-
-    socket.on(`fetchPlayers`, (data: { room: string }) => {
-      const players = io.sockets.adapter.rooms.get(data.room)?.size
-      console.log(`players in room ${players}`)
-      io.sockets.in(data.room).emit(`playersInRoom`, players)
-    })
-
-    socket.on(`resetGame`, (data: { room: string }) => {
-      io.sockets.in(data.room).emit(`gameReset`)
-    })
-
-    socket.on(`disconnect`, () => {
-      console.log(`disconnected`)
-    })
+  const onConnection = (socket: MySocket) => {
+    sendMessage(socket, io)
+    joinRoom(socket, io)
+    makeMove(socket, io)
+    cameraMove(socket, io)
+    fetchPlayers(socket, io)
+    resetGame(socket, io)
+    disconnect(socket, io)
   }
 
   // Define actions inside

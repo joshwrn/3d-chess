@@ -15,7 +15,6 @@ export const Opponent: FC = () => {
         style={{
           width: `100px`,
           height: `100px`,
-          // background: `red`,
           borderRadius: `50%`,
           display: `flex`,
           justifyContent: `center`,
@@ -31,12 +30,6 @@ export const Opponent: FC = () => {
       >
         josh
       </Html>
-      <pointLight
-        castShadow
-        intensity={0.5}
-        color={`#0091ff`}
-        position={[0, 0, 0]}
-      />
       <mesh position={[0, 0, 0]} onClick={handleClick}>
         <sphereGeometry args={[0.5, 50, 10]} />
         <meshStandardMaterial metalness={1} roughness={0.4} color="#ffffff" />

@@ -36,8 +36,8 @@ import * as THREE from 'three'
 
 import { isKing } from '@/logic/pieces/king'
 import { isRook } from '@/logic/pieces/rook'
-import type { CameraMove } from '@/pages/api/socket'
 import type { GameOver } from '@/pages/index'
+import type { CameraMove } from '@/server/cameraMove'
 import { useGameSettingsState } from '@/state/game'
 import { useHistoryState } from '@/state/history'
 import { useOpponentState, usePlayerState } from '@/state/player'
@@ -294,13 +294,6 @@ export const BoardComponent: FC<{
         color={0x0000ff} // Default
         lineWidth={10} // In pixels (default)
       /> */}
-      <pointLight
-        castShadow
-        intensity={0.5}
-        color={`#0091ff`}
-        position={ownPosition.position}
-        rotation={ownPosition.rotation}
-      />
 
       <hemisphereLight intensity={0.5} color="#ffa4a4" groundColor="#d886b7" />
       {/* @ts-ignore */}
