@@ -1,8 +1,7 @@
 import type { FC } from 'react'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 import { css } from '@emotion/react'
-import { useProgress } from '@react-three/drei'
 
 export const Loader: FC = () => {
   return (

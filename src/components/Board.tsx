@@ -24,13 +24,7 @@ import { QueenComponent } from '@models/Queen'
 import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
 import { useSpring, animated } from '@react-spring/three'
-import {
-  Line,
-  OrbitControls,
-  OrbitControlsProps,
-  PerspectiveCamera,
-} from '@react-three/drei'
-import type { Vector3 } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -40,7 +34,7 @@ import type { GameOver } from '@/pages/index'
 import type { CameraMove } from '@/server/cameraMove'
 import { useGameSettingsState } from '@/state/game'
 import { useHistoryState } from '@/state/history'
-import { useOpponentState, usePlayerState } from '@/state/player'
+import { usePlayerState } from '@/state/player'
 import { useSocketState } from '@/utils/socket'
 
 type ThreeMouseEvent = {

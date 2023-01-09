@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import { Html, Text } from '@react-three/drei'
+import { Html } from '@react-three/drei'
 
 import { useOpponentState, usePlayerState } from '@/state/player'
 

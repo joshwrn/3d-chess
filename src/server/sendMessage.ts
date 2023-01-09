@@ -1,5 +1,3 @@
-import type { Server } from 'socket.io'
-
 import type { MessageClient } from '@/components/Chat'
 import type { MyServer, MySocket } from '@/pages/api/socket'
 import type { Message } from '@/state/player'

@@ -1,5 +1,3 @@
-import type { Server } from 'socket.io'
-
 import type { JoinRoomClient } from '@/components/GameCreation'
 import type { Color } from '@/logic/pieces'
 import type { MyServer, MySocket, playerJoinedServer } from '@/pages/api/socket'
