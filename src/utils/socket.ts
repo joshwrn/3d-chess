@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 
-import type { DefaultEventsMap } from '@socket.io/component-emitter'
 import { toast } from 'react-toastify'
 import type { Socket } from 'socket.io-client'
 // eslint-disable-next-line import/no-named-as-default
@@ -8,7 +7,11 @@ import io from 'socket.io-client'
 import create from 'zustand'
 
 import type { MovingTo } from '@/components/Board'
-import type { playerJoinedServer } from '@/pages/api/socket'
+import type {
+  SocketClientToServer,
+  SocketServerToClient,
+  playerJoinedServer,
+} from '@/pages/api/socket'
 import type { CameraMove } from '@/server/cameraMove'
 import { useGameSettingsState } from '@/state/game'
 import type { Message } from '@/state/player'
@@ -18,11 +21,12 @@ import {
   useMessageState,
 } from '@/state/player'
 
-let socket: Socket<DefaultEventsMap, DefaultEventsMap>
+type ClientSocket = Socket<SocketServerToClient, SocketClientToServer>
+let socket: ClientSocket
 
 export const useSocketState = create<{
-  socket: Socket<DefaultEventsMap, DefaultEventsMap> | null
-  setSocket: (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => void
+  socket: ClientSocket | null
+  setSocket: (socket: ClientSocket) => void
 }>((set) => ({
   socket: null,
   setSocket: (socket) => set({ socket }),
@@ -39,7 +43,6 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
   const {
     setPosition,
     setRotation,
-    setMousePosition,
     setName: setOpponentName,
   } = useOpponentState((state) => state)
 
@@ -106,7 +109,7 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
       setMovingTo(data)
     })
 
-    socket.on(`resetGame`, () => {
+    socket.on(`gameReset`, () => {
       reset()
     })
 

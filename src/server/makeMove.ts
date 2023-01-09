@@ -1,5 +1,3 @@
-import type { Server } from 'socket.io'
-
 import type { MakeMoveClient } from '@/components/Board'
 import type { MyServer, MySocket } from '@/pages/api/socket'
 

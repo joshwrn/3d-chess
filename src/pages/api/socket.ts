@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Socket, ServerOptions } from 'socket.io'
 import { Server } from 'socket.io'
 
-import type { MakeMoveClient } from '@/components/Board'
+import type { MakeMoveClient, MovingTo } from '@/components/Board'
 import type { MessageClient } from '@/components/Chat'
 import type { JoinRoomClient } from '@/components/GameCreation'
 import type { Color } from '@/logic/pieces'
@@ -15,6 +15,7 @@ import { joinRoom } from '@/server/joinRoom'
 import { makeMove } from '@/server/makeMove'
 import { resetGame } from '@/server/resetGame'
 import { sendMessage } from '@/server/sendMessage'
+import type { Message } from '@/state/player'
 
 export type playerJoinedServer = {
   room: string
@@ -41,12 +42,12 @@ export interface SocketClientToServer {
 }
 
 export interface SocketServerToClient {
-  newIncomingMessage: (MessageClient: MessageClient) => void
+  newIncomingMessage: (MessageClient: Message) => void
   playerJoined: (playerJoinedServer: playerJoinedServer) => void
-  moveMade: (movingTo: MakeMoveClient) => void
+  moveMade: (movingTo: MovingTo) => void
   cameraMoved: (CameraMove: CameraMove) => void
-  playersInRoom: (players: string[]) => void
-  gameReset: (Room: Room) => void
+  playersInRoom: (players: number) => void
+  gameReset: (data: boolean) => void
   newError: (error: string) => void
   joinRoom: (JoinRoomClient: JoinRoomClient) => void
   playerLeft: (Room: Room) => void

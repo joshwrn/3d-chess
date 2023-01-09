@@ -1,5 +1,3 @@
-import type { Server } from 'socket.io'
-
 import type { Color } from '@/logic/pieces'
 import type { MyServer, MySocket } from '@/pages/api/socket'
 
