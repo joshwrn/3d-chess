@@ -26,41 +26,35 @@ export type playerJoinedServer = {
 export type Room = {
   room: string
 }
-export interface SocketOnDataTypes {
-  createdMessage: MessageClient
-  joinRoom: JoinRoomClient
-  makeMove: MakeMoveClient
-  cameraMove: CameraMove
-  fetchPlayers: Room
-  resetGame: Room
-  playerLeft: Room
-  disconnect: Room
-  disconnecting: any
-  error: any
-  existingPlayer: Room & { name: string }
+export interface SocketClientToServer {
+  createdMessage: (MessageClient: MessageClient) => void
+  joinRoom: (JoinRoomClient: JoinRoomClient) => void
+  makeMove: (MakeMoveClient: MakeMoveClient) => void
+  cameraMove: (CameraMove: CameraMove) => void
+  fetchPlayers: (Room: Room) => void
+  resetGame: (Room: Room) => void
+  playerLeft: (Room: Room) => void
+  disconnect: (Room: Room) => void
+  disconnecting: (Room: any) => void
+  error: (Room: any) => void
+  existingPlayer: (room: Room & { name: string }) => void
 }
 
-export type On = {
-  on<K extends keyof SocketOnDataTypes>(
-    event: K,
-    callback: (data: SocketOnDataTypes[K]) => void,
-  ): void
+export interface SocketServerToClient {
+  newIncomingMessage: (MessageClient: MessageClient) => void
+  playerJoined: (playerJoinedServer: playerJoinedServer) => void
+  moveMade: (movingTo: MakeMoveClient) => void
+  cameraMoved: (CameraMove: CameraMove) => void
+  playersInRoom: (players: string[]) => void
+  gameReset: (Room: Room) => void
+  newError: (error: string) => void
+  joinRoom: (JoinRoomClient: JoinRoomClient) => void
+  playerLeft: (Room: Room) => void
+  clientExistingPlayer: (name: string) => void
 }
 
-export const socketEmitEvents = [
-  `newIncomingMessage`,
-  `playerJoined`,
-  `moveMade`,
-  `cameraMoved`,
-  `playersInRoom`,
-  `gameReset`,
-  `newError`,
-  `joinRoom`,
-  `playerLeft`,
-  `clientExistingPlayer`,
-] as const
-export type SocketEmitEvents = typeof socketEmitEvents[number]
-export type MySocket = Omit<Socket, `on`> & On
+export type MySocket = Socket<SocketClientToServer, SocketServerToClient>
+export type MyServer = Server<SocketClientToServer, SocketServerToClient>
 
 export default function SocketHandler(
   req: NextApiRequest,
@@ -79,7 +73,9 @@ export default function SocketHandler(
     return
   }
 
-  const io = new Server(res?.socket?.server)
+  const io = new Server<SocketClientToServer, SocketServerToClient>(
+    res?.socket?.server,
+  )
   res.socket.server.io = io
 
   const onConnection = (socket: MySocket) => {
@@ -91,9 +87,7 @@ export default function SocketHandler(
     resetGame(socket, io)
     disconnect(socket, io)
     socket.on(`existingPlayer`, (data) => {
-      io.sockets
-        .in(data.room)
-        .emit<SocketEmitEvents>(`clientExistingPlayer`, data.name)
+      io.sockets.in(data.room).emit(`clientExistingPlayer`, data.name)
     })
   }
 
