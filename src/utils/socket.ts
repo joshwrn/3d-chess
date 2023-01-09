@@ -73,11 +73,22 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
         author: `System`,
         message: `${split[0]} has joined ${data.room}`,
       })
-      const { id } = usePlayerState.getState()
+      const { id, username } = usePlayerState.getState()
       if (split[1] === id) {
         setPlayerColor(data.color)
         setJoinedRoom(true)
       } else {
+        socket.emit(`existingPlayer`, {
+          room: data.room,
+          name: `${username}#${id}`,
+        })
+        setOpponentName(split[0])
+      }
+    })
+
+    socket.on(`clientExistingPlayer`, (data: string) => {
+      const split = data.split(`#`)
+      if (split[1] !== usePlayerState.getState().id) {
         setOpponentName(split[0])
       }
     })

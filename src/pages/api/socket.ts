@@ -28,6 +28,7 @@ export const socketOnEvents = [
   `resetGame`,
   `playerLeft`,
   `disconnect`,
+  `existingPlayer`,
 ] as const
 export type SocketOnEvents = typeof socketOnEvents[number]
 interface On {
@@ -43,6 +44,7 @@ export const socketEmitEvents = [
   `newError`,
   `joinRoom`,
   `playerLeft`,
+  `clientExistingPlayer`,
 ] as const
 export type SocketEmitEvents = typeof socketEmitEvents[number]
 export type MySocket = Omit<Socket, `on`> & On
@@ -75,6 +77,11 @@ export default function SocketHandler(
     fetchPlayers(socket, io)
     resetGame(socket, io)
     disconnect(socket, io)
+    socket.on(`existingPlayer`, (data) => {
+      io.sockets
+        .in(data.room)
+        .emit<SocketEmitEvents>(`clientExistingPlayer`, data.name)
+    })
   }
 
   // Define actions inside
