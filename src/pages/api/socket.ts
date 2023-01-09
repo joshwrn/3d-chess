@@ -26,6 +26,7 @@ export const socketOnEvents = [
   `cameraMove`,
   `fetchPlayers`,
   `resetGame`,
+  `playerLeft`,
   `disconnect`,
 ] as const
 export type SocketOnEvents = typeof socketOnEvents[number]

@@ -28,65 +28,71 @@ export const GameCreation: FC = () => {
     const data: JoinRoomClient = { room, username }
     socket.emit(`joinRoom`, data)
     socket.emit(`fetchPlayers`, { room })
-    setJoinedRoom(true)
   }
   return (
     <>
       {!joinedRoom && (
         <>
-          <div
-            css={css`
-              width: 300px;
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              z-index: 100;
-              backdrop-filter: blur(30px);
-              background-color: #ffffff8d;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              align-items: flex-start;
-              border-radius: 10px;
-              padding: 25px 40px;
-              gap: 20px;
-              p {
-                font-size: 12px;
-                color: #00000092;
-                padding-top: 10px;
-              }
-              div {
-                width: 100%;
-              }
-              input {
-                padding-bottom: 10px;
-                width: 100%;
-                border-color: #000000;
-                color: #000000;
-                ::placeholder {
-                  color: #000000;
-                }
-              }
-            `}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              sendRoom()
+            }}
           >
-            <input
-              type="text"
-              placeholder="Your Name"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <div>
+            <div
+              css={css`
+                width: 300px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 100;
+                backdrop-filter: blur(30px);
+                background-color: #ffffff8d;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                border-radius: 10px;
+                padding: 25px 40px;
+                gap: 20px;
+                p {
+                  font-size: 12px;
+                  color: #00000092;
+                  padding-top: 10px;
+                }
+                div {
+                  width: 100%;
+                }
+                input {
+                  padding-bottom: 10px;
+                  width: 100%;
+                  border-color: #000000;
+                  color: #000000;
+                  ::placeholder {
+                    color: #000000;
+                  }
+                }
+              `}
+            >
               <input
                 type="text"
-                placeholder="Room"
-                value={room}
-                onChange={(e) => setRoom(e.target.value)}
+                placeholder="Name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
-              <p>If no room exists one will be created.</p>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Room"
+                  value={room}
+                  onChange={(e) => setRoom(e.target.value)}
+                />
+                <p>If no room exists one will be created.</p>
+              </div>
+              <button type="submit">Join Room</button>
             </div>
-            <button onClick={sendRoom}>Join Room</button>
-          </div>
+          </form>
           <div
             css={css`
               position: absolute;

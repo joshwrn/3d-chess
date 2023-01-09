@@ -23,11 +23,15 @@ export const useOpponentState = create<{
   setPosition: (position: [number, number, number]) => void
   setRotation: (rotation: [number, number, number]) => void
   setMousePosition: (mousePosition: [number, number, number]) => void
+  name: string
+  setName: (name: string) => void
 }>((set) => ({
-  position: [0, 0, 0],
+  position: [0, 100, 0],
   rotation: [0, 0, 0],
   setPosition: (position) => set({ position }),
   setRotation: (rotation) => set({ rotation }),
+  name: ``,
+  setName: (name) => set({ name }),
   mousePosition: [0, 0, 0],
   setMousePosition: (mousePosition) => set({ mousePosition }),
 }))
@@ -42,9 +46,9 @@ export const usePlayerState = create<{
   playerColor: Color
   setPlayerColor: (color: Color) => void
 }>((set) => ({
-  username: ``,
+  username: `josh`,
   setUsername: (username) => set({ username }),
-  room: ``,
+  room: `one`,
   setRoom: (room) => set({ room }),
   joinedRoom: false,
   setJoinedRoom: (joinedRoom) => set({ joinedRoom }),

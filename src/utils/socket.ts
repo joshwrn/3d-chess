@@ -1,13 +1,15 @@
 import { useEffect } from 'react'
 
 import type { DefaultEventsMap } from '@socket.io/component-emitter'
+import { toast } from 'react-toastify'
 import type { Socket } from 'socket.io-client'
 // eslint-disable-next-line import/no-named-as-default
 import io from 'socket.io-client'
 import create from 'zustand'
 
 import type { MovingTo } from '@/components/Board'
-import type { CameraMove, playerJoinedServer } from '@/pages/api/socket'
+import type { playerJoinedServer } from '@/pages/api/socket'
+import type { CameraMove } from '@/server/cameraMove'
 import { useGameSettingsState } from '@/state/game'
 import type { Message } from '@/state/player'
 import {
@@ -32,9 +34,7 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
     setGameStarted: state.setGameStarted,
     setMovingTo: state.setMovingTo,
   }))
-  const { setPlayerColor } = usePlayerState((state) => ({
-    setPlayerColor: state.setPlayerColor,
-  }))
+  const { setPlayerColor, setJoinedRoom } = usePlayerState((state) => state)
 
   const { setPosition, setRotation, setMousePosition } = useOpponentState(
     (state) => state,
@@ -49,6 +49,7 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
 
     return () => {
       if (socketState) {
+        socketState.emit(`playerLeft`, { room: usePlayerState.getState().room })
         socketState.disconnect()
       }
     }
@@ -71,6 +72,7 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
       const { username } = usePlayerState.getState()
       if (data.username === username) {
         setPlayerColor(data.color)
+        setJoinedRoom(true)
       }
     })
 
@@ -95,6 +97,12 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
       if (data === 2) {
         setGameStarted(true)
       }
+    })
+
+    socket.on(`newError`, (err: string) => {
+      toast.error(err, {
+        theme: `dark`,
+      })
     })
   }
 }
