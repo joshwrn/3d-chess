@@ -10,17 +10,12 @@ import type {
 
 export const joinRoom = (socket: MySocket, io: Server): void => {
   socket.on(`joinRoom`, (data: JoinRoomClient) => {
-    const rooms = new Set<string>()
     const { room, username } = data
 
     const playerCount = io.sockets.adapter.rooms.get(data.room)?.size || 0
     if (playerCount === 2) {
       socket.emit<SocketEmitEvents>(`newError`, `Room is full`)
       return
-    }
-
-    if (!rooms.has(room)) {
-      rooms.add(room)
     }
 
     socket.join(room)
