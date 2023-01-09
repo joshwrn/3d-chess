@@ -11,21 +11,14 @@ export type JoinRoomClient = {
 }
 
 export const GameCreation: FC = () => {
-  const { room, username, setJoinedRoom, joinedRoom, setUsername, setRoom } =
-    usePlayerState((state) => ({
-      room: state.room,
-      username: state.username,
-      setJoinedRoom: state.setJoinedRoom,
-      joinedRoom: state.joinedRoom,
-      setUsername: state.setUsername,
-      setRoom: state.setRoom,
-    }))
+  const { room, username, setJoinedRoom, joinedRoom, setUsername, setRoom, id } =
+    usePlayerState((state) => state)
   const { socket } = useSocketState((state) => ({
     socket: state.socket,
   }))
   const sendRoom = async () => {
     if (!socket) return
-    const data: JoinRoomClient = { room, username }
+    const data: JoinRoomClient = { room, username: `${username}#${id}` }
     socket.emit(`joinRoom`, data)
     socket.emit(`fetchPlayers`, { room })
   }
@@ -80,6 +73,8 @@ export const GameCreation: FC = () => {
                 placeholder="Name"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                minLength={3}
+                maxLength={10}
               />
               <div>
                 <input
@@ -87,6 +82,8 @@ export const GameCreation: FC = () => {
                   placeholder="Room"
                   value={room}
                   onChange={(e) => setRoom(e.target.value)}
+                  minLength={3}
+                  maxLength={16}
                 />
                 <p>If no room exists one will be created.</p>
               </div>

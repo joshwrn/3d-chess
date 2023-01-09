@@ -10,7 +10,7 @@ import type {
 
 export const joinRoom = (socket: MySocket, io: Server): void => {
   socket.on(`joinRoom`, (data: JoinRoomClient) => {
-    const rooms = new Map<string, string[]>()
+    const rooms = new Set<string>()
     const { room, username } = data
 
     const playerCount = io.sockets.adapter.rooms.get(data.room)?.size || 0
@@ -19,19 +19,8 @@ export const joinRoom = (socket: MySocket, io: Server): void => {
       return
     }
 
-    if (rooms.has(room)) {
-      const players = rooms.get(room)
-      if (!players) return
-      if (players.some((player) => player === username)) {
-        socket.emit<SocketEmitEvents>(`newError`, `Name is already taken`)
-        return
-      }
-      if (players) {
-        players.push(username)
-        rooms.set(room, players)
-      }
-    } else {
-      rooms.set(room, [username])
+    if (!rooms.has(room)) {
+      rooms.add(room)
     }
 
     socket.join(room)

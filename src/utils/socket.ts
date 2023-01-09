@@ -36,9 +36,12 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
   }))
   const { setPlayerColor, setJoinedRoom } = usePlayerState((state) => state)
 
-  const { setPosition, setRotation, setMousePosition } = useOpponentState(
-    (state) => state,
-  )
+  const {
+    setPosition,
+    setRotation,
+    setMousePosition,
+    setName: setOpponentName,
+  } = useOpponentState((state) => state)
 
   const { socket: socketState, setSocket } = useSocketState((state) => ({
     socket: state.socket,
@@ -65,14 +68,17 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
     })
 
     socket.on(`playerJoined`, (data: playerJoinedServer) => {
+      const split = data.username.split(`#`)
       addMessage({
         author: `System`,
-        message: `${data.username} has joined ${data.room}`,
+        message: `${split[0]} has joined ${data.room}`,
       })
-      const { username } = usePlayerState.getState()
-      if (data.username === username) {
+      const { id } = usePlayerState.getState()
+      if (split[1] === id) {
         setPlayerColor(data.color)
         setJoinedRoom(true)
+      } else {
+        setOpponentName(split[0])
       }
     })
 

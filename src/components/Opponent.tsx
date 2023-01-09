@@ -2,13 +2,14 @@ import type { FC } from 'react'
 
 import { Html, Text } from '@react-three/drei'
 
-import { useOpponentState } from '@/state/player'
+import { useOpponentState, usePlayerState } from '@/state/player'
 
 export const Opponent: FC = () => {
   const handleClick = () => {
     console.log(`click`)
   }
-  const { position, rotation } = useOpponentState((state) => state)
+  const { position, rotation, name } = useOpponentState((state) => state)
+  const { playerColor } = usePlayerState((state) => state)
   return (
     <group position={position} rotation={rotation}>
       <Html
@@ -28,11 +29,15 @@ export const Opponent: FC = () => {
         prepend={true}
         position={[0, 1.2, 0]}
       >
-        josh
+        {name}
       </Html>
       <mesh position={[0, 0, 0]} onClick={handleClick}>
         <sphereGeometry args={[0.5, 50, 10]} />
-        <meshStandardMaterial metalness={1} roughness={0.4} color="#ffffff" />
+        <meshStandardMaterial
+          metalness={1}
+          roughness={0.4}
+          color={playerColor === `white` ? `#4b4b4b` : `#ffffff`}
+        />
       </mesh>
     </group>
   )

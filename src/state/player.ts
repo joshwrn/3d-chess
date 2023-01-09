@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid'
 import create from 'zustand'
 
 import type { Color } from '@/logic/pieces'
@@ -38,6 +39,7 @@ export const useOpponentState = create<{
 
 export const usePlayerState = create<{
   username: string
+  id: string
   setUsername: (username: string) => void
   room: string
   setRoom: (room: string) => void
@@ -48,6 +50,7 @@ export const usePlayerState = create<{
 }>((set) => ({
   username: `josh`,
   setUsername: (username) => set({ username }),
+  id: nanoid(),
   room: `one`,
   setRoom: (room) => set({ room }),
   joinedRoom: false,
