@@ -11,7 +11,7 @@ export type JoinRoomClient = {
 }
 
 export const GameCreation: FC = () => {
-  const { room, username, setJoinedRoom, joinedRoom, setUsername, setRoom, id } =
+  const { room, username, joinedRoom, setUsername, setRoom, id } =
     usePlayerState((state) => state)
   const { socket } = useSocketState((state) => ({
     socket: state.socket,

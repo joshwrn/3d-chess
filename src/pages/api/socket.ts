@@ -3,7 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Socket, ServerOptions } from 'socket.io'
 import { Server } from 'socket.io'
 
+import type { MakeMoveClient } from '@/components/Board'
+import type { MessageClient } from '@/components/Chat'
+import type { JoinRoomClient } from '@/components/GameCreation'
 import type { Color } from '@/logic/pieces'
+import type { CameraMove } from '@/server/cameraMove'
 import { cameraMove } from '@/server/cameraMove'
 import { disconnect } from '@/server/disconnect'
 import { fetchPlayers } from '@/server/fetchPlayers'
@@ -19,21 +23,30 @@ export type playerJoinedServer = {
   playerCount: number
 }
 
-export const socketOnEvents = [
-  `createdMessage`,
-  `joinRoom`,
-  `makeMove`,
-  `cameraMove`,
-  `fetchPlayers`,
-  `resetGame`,
-  `playerLeft`,
-  `disconnect`,
-  `existingPlayer`,
-] as const
-export type SocketOnEvents = typeof socketOnEvents[number]
-interface On {
-  on: (event: SocketOnEvents, callback: (data: any) => void) => void
+export type Room = {
+  room: string
 }
+export interface SocketOnDataTypes {
+  createdMessage: MessageClient
+  joinRoom: JoinRoomClient
+  makeMove: MakeMoveClient
+  cameraMove: CameraMove
+  fetchPlayers: Room
+  resetGame: Room
+  playerLeft: Room
+  disconnect: Room
+  disconnecting: any
+  error: any
+  existingPlayer: Room & { name: string }
+}
+
+export type On = {
+  on<K extends keyof SocketOnDataTypes>(
+    event: K,
+    callback: (data: SocketOnDataTypes[K]) => void,
+  ): void
+}
+
 export const socketEmitEvents = [
   `newIncomingMessage`,
   `playerJoined`,
