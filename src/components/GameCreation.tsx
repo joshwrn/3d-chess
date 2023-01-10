@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import type { ChangeEvent, FC } from 'react'
 
 import { css } from '@emotion/react'
 
@@ -8,6 +8,15 @@ import { useSocketState } from '@/utils/socket'
 export type JoinRoomClient = {
   room: string
   username: string
+}
+
+const filter = (
+  e: ChangeEvent<HTMLInputElement>,
+  set: (str: string) => void,
+) => {
+  const str = e.target.value
+  const filtered = str.replace(/[^a-zA-Z0-9]/g, ``)
+  set(filtered)
 }
 
 export const GameCreation: FC = () => {
@@ -72,7 +81,7 @@ export const GameCreation: FC = () => {
                 type="text"
                 placeholder="Name"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => filter(e, setUsername)}
                 minLength={3}
                 maxLength={10}
               />
@@ -81,7 +90,7 @@ export const GameCreation: FC = () => {
                   type="text"
                   placeholder="Room"
                   value={room}
-                  onChange={(e) => setRoom(e.target.value)}
+                  onChange={(e) => filter(e, setRoom)}
                   minLength={3}
                   maxLength={16}
                 />
