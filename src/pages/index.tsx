@@ -79,7 +79,7 @@ export const Home: FC = () => {
       <GameOverScreen gameOver={gameOver} />
       <ToastContainer />
       <Canvas shadows camera={{ position: [-12, 5, 6], fov: 50 }}>
-        <Environment preset="city" />
+        <Environment preset="dawn" />
         <Opponent />
         <Border />
         <BoardComponent

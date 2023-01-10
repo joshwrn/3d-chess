@@ -38,6 +38,7 @@ export const GameCreation: FC = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault()
+              if (username.length < 3 || room.length < 3) return
               sendRoom()
             }}
           >

@@ -34,6 +34,7 @@ import type { CameraMove } from '@/server/cameraMove'
 import { useGameSettingsState } from '@/state/game'
 import { useHistoryState } from '@/state/history'
 import { usePlayerState } from '@/state/player'
+import { isDev } from '@/utils/isDev'
 import { useSocketState } from '@/utils/socket'
 
 type ThreeMouseEvent = {
@@ -92,7 +93,7 @@ export const BoardComponent: FC<{
 
   const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
-    const isPlayersTurn = turn === playerColor
+    const isPlayersTurn = turn === playerColor || isDev
     if (!isPlayersTurn || !gameStarted) return
     if (!tile?.piece?.type && !selected) return
     if (!tile?.piece) {
@@ -294,7 +295,7 @@ export const BoardComponent: FC<{
             const tileContainsOtherPlayersPiece =
               tile.piece && tile.piece?.color !== turn
 
-            if (tileContainsOtherPlayersPiece && !canMoveHere) {
+            if (tileContainsOtherPlayersPiece && !canMoveHere && !isDev) {
               setSelected(null)
               return
             }
