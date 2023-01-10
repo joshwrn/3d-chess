@@ -9,8 +9,6 @@ import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs'
 
 import { HistoryPanel } from './History'
 import { MiniMap } from './MiniMap'
-import { useGameSettingsState } from '@/state/game'
-import { useHistoryState } from '@/state/history'
 import { usePlayerState } from '@/state/player'
 
 export const Sidebar: FC<{

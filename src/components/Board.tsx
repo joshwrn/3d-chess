@@ -24,13 +24,17 @@ import { QueenComponent } from '@models/Queen'
 import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
 import { useSpring, animated } from '@react-spring/three'
+import { OrbitControls } from '@react-three/drei'
+import { useFrame, useThree } from '@react-three/fiber'
 
 import { isKing } from '@/logic/pieces/king'
 import { isRook } from '@/logic/pieces/rook'
 import type { GameOver } from '@/pages/index'
+import type { CameraMove } from '@/server/cameraMove'
 import { useGameSettingsState } from '@/state/game'
 import { useHistoryState } from '@/state/history'
 import { usePlayerState } from '@/state/player'
+import { isDev } from '@/utils/isDev'
 import { useSocketState } from '@/utils/socket'
 
 type ThreeMouseEvent = {
@@ -89,7 +93,7 @@ export const BoardComponent: FC<{
 
   const selectThisPiece = (e: ThreeMouseEvent, tile: Tile | null) => {
     e.stopPropagation()
-    const isPlayersTurn = turn === playerColor
+    const isPlayersTurn = turn === playerColor || isDev
     if (!isPlayersTurn || !gameStarted) return
     if (!tile?.piece?.type && !selected) return
     if (!tile?.piece) {
@@ -205,8 +209,49 @@ export const BoardComponent: FC<{
     intensity: selected ? 0.35 : 0,
   })
 
+  const { camera } = useThree()
+
+  const [ownPosition, setOwnPosition] = useState<{
+    position: [number, number, number]
+    rotation: [number, number, number]
+  }>({
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+  })
+
+  useFrame(() => {
+    // just don't send if position hasn't changed
+    const { x, y, z } = camera.position
+    if (
+      x === ownPosition.position[0] &&
+      y === ownPosition.position[1] &&
+      z === ownPosition.position[2]
+    ) {
+      return
+    }
+    const { x: rx, y: ry, z: rz } = camera.rotation
+
+    setOwnPosition({
+      position: [x, y, z],
+      rotation: [rx, ry, rz],
+    })
+
+    socket?.emit(`cameraMove`, {
+      position: [x, y, z],
+      rotation: [rx, ry, rz],
+      room: room,
+      color: playerColor,
+    } satisfies CameraMove)
+  })
+
   return (
     <group position={[-3.5, -0.5, -3.5]}>
+      <OrbitControls
+        maxDistance={25}
+        minDistance={7}
+        enableZoom={true}
+        enablePan={false}
+      />
       <pointLight
         shadow-mapSize={[2048, 2048]}
         castShadow
@@ -250,7 +295,7 @@ export const BoardComponent: FC<{
             const tileContainsOtherPlayersPiece =
               tile.piece && tile.piece?.color !== turn
 
-            if (tileContainsOtherPlayersPiece && !canMoveHere) {
+            if (tileContainsOtherPlayersPiece && !canMoveHere && !isDev) {
               setSelected(null)
               return
             }

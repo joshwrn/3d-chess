@@ -1,22 +1,32 @@
 import { useEffect } from 'react'
 
-import type { DefaultEventsMap } from '@socket.io/component-emitter'
+import { toast } from 'react-toastify'
 import type { Socket } from 'socket.io-client'
 // eslint-disable-next-line import/no-named-as-default
 import io from 'socket.io-client'
 import create from 'zustand'
 
 import type { MovingTo } from '@/components/Board'
-import type { playerJoinedServer } from '@/pages/api/socket'
+import type {
+  SocketClientToServer,
+  SocketServerToClient,
+  playerJoinedServer,
+} from '@/pages/api/socket'
+import type { CameraMove } from '@/server/cameraMove'
 import { useGameSettingsState } from '@/state/game'
 import type { Message } from '@/state/player'
-import { usePlayerState, useMessageState } from '@/state/player'
+import {
+  useOpponentState,
+  usePlayerState,
+  useMessageState,
+} from '@/state/player'
 
-let socket: Socket<DefaultEventsMap, DefaultEventsMap>
+type ClientSocket = Socket<SocketServerToClient, SocketClientToServer>
+let socket: ClientSocket
 
 export const useSocketState = create<{
-  socket: Socket<DefaultEventsMap, DefaultEventsMap> | null
-  setSocket: (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => void
+  socket: ClientSocket | null
+  setSocket: (socket: ClientSocket) => void
 }>((set) => ({
   socket: null,
   setSocket: (socket) => set({ socket }),
@@ -28,9 +38,13 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
     setGameStarted: state.setGameStarted,
     setMovingTo: state.setMovingTo,
   }))
-  const { setPlayerColor } = usePlayerState((state) => ({
-    setPlayerColor: state.setPlayerColor,
-  }))
+  const { setPlayerColor, setJoinedRoom } = usePlayerState((state) => state)
+
+  const {
+    setPosition,
+    setRotation,
+    setName: setOpponentName,
+  } = useOpponentState((state) => state)
 
   const { socket: socketState, setSocket } = useSocketState((state) => ({
     socket: state.socket,
@@ -41,6 +55,7 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
 
     return () => {
       if (socketState) {
+        socketState.emit(`playerLeft`, { room: usePlayerState.getState().room })
         socketState.disconnect()
       }
     }
@@ -56,21 +71,45 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
     })
 
     socket.on(`playerJoined`, (data: playerJoinedServer) => {
+      const split = data.username.split(`#`)
       addMessage({
         author: `System`,
-        message: `${data.username} has joined ${data.room}`,
+        message: `${split[0]} has joined ${data.room}`,
       })
-      const { username } = usePlayerState.getState()
-      if (data.username === username) {
+      const { id, username } = usePlayerState.getState()
+      if (split[1] === id) {
         setPlayerColor(data.color)
+        setJoinedRoom(true)
+      } else {
+        socket.emit(`existingPlayer`, {
+          room: data.room,
+          name: `${username}#${id}`,
+        })
+        setOpponentName(split[0])
       }
+    })
+
+    socket.on(`clientExistingPlayer`, (data: string) => {
+      const split = data.split(`#`)
+      if (split[1] !== usePlayerState.getState().id) {
+        setOpponentName(split[0])
+      }
+    })
+
+    socket.on(`cameraMoved`, (data: CameraMove) => {
+      const { playerColor } = usePlayerState.getState()
+      if (playerColor === data.color) {
+        return
+      }
+      setPosition(data.position)
+      setRotation(data.rotation)
     })
 
     socket.on(`moveMade`, (data: MovingTo) => {
       setMovingTo(data)
     })
 
-    socket.on(`resetGame`, () => {
+    socket.on(`gameReset`, () => {
       reset()
     })
 
@@ -78,6 +117,12 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
       if (data === 2) {
         setGameStarted(true)
       }
+    })
+
+    socket.on(`newError`, (err: string) => {
+      toast.error(err, {
+        theme: `dark`,
+      })
     })
   }
 }
