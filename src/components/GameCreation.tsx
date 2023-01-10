@@ -39,10 +39,12 @@ export const GameCreation: FC = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              toast.error(`Name or Room is too short.`, {
-                toastId: `nameOrRoomTooShort`,
-              })
-              if (username.length < 3 || room.length < 3) return
+              if (username.length < 3 || room.length < 3) {
+                toast.error(`Name or Room is too short.`, {
+                  toastId: `nameOrRoomTooShort`,
+                })
+                return
+              }
               sendRoom()
             }}
           >
