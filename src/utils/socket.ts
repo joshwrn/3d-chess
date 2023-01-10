@@ -121,7 +121,7 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
 
     socket.on(`newError`, (err: string) => {
       toast.error(err, {
-        theme: `dark`,
+        toastId: err,
       })
     })
   }

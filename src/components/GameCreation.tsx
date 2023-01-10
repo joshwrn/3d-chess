@@ -1,6 +1,7 @@
 import type { ChangeEvent, FC } from 'react'
 
 import { css } from '@emotion/react'
+import { toast } from 'react-toastify'
 
 import { usePlayerState } from '@/state/player'
 import { useSocketState } from '@/utils/socket'
@@ -38,6 +39,9 @@ export const GameCreation: FC = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault()
+              toast.error(`Name or Room is too short.`, {
+                toastId: `nameOrRoomTooShort`,
+              })
               if (username.length < 3 || room.length < 3) return
               sendRoom()
             }}

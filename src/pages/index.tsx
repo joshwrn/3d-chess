@@ -7,7 +7,6 @@ import { createBoard } from '@logic/board'
 import type { Color, GameOverType, Move, Piece } from '@logic/pieces'
 import { Environment, useProgress } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { ToastContainer } from 'react-toastify'
 
 import { BoardComponent } from '@/components/Board'
 import { Chat } from '@/components/Chat'
@@ -17,6 +16,7 @@ import { Loader } from '@/components/Loader'
 import { Opponent } from '@/components/Opponent'
 import { Sidebar } from '@/components/Sidebar'
 import { StatusBar } from '@/components/StatusBar'
+import { Toast } from '@/components/Toast'
 import { Border } from '@/models/Border'
 import { useGameSettingsState } from '@/state/game'
 import { useHistoryState } from '@/state/history'
@@ -77,7 +77,7 @@ export const Home: FC = () => {
       {joined && <Chat />}
       <StatusBar />
       <GameOverScreen gameOver={gameOver} />
-      <ToastContainer />
+      <Toast />
       <Canvas shadows camera={{ position: [-12, 5, 6], fov: 50 }}>
         <Environment preset="dawn" />
         <Opponent />
