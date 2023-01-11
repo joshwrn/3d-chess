@@ -40,11 +40,9 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
   }))
   const { setPlayerColor, setJoinedRoom } = usePlayerState((state) => state)
 
-  const {
-    setPosition,
-    setRotation,
-    setName: setOpponentName,
-  } = useOpponentState((state) => state)
+  const { setPosition, setName: setOpponentName } = useOpponentState(
+    (state) => state,
+  )
 
   const { socket: socketState, setSocket } = useSocketState((state) => ({
     socket: state.socket,
@@ -102,7 +100,6 @@ export const useSockets = ({ reset }: { reset: VoidFunction }): void => {
         return
       }
       setPosition(data.position)
-      setRotation(data.rotation)
     })
 
     socket.on(`moveMade`, (data: MovingTo) => {

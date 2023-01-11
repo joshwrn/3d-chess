@@ -3,7 +3,6 @@ import type { MyServer, MySocket } from '@/pages/api/socket'
 
 export type CameraMove = {
   position: [number, number, number]
-  rotation: [number, number, number]
   room: string
   color: Color
 }

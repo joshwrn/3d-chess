@@ -214,16 +214,14 @@ export const BoardComponent: FC<{
   useEffect(() => {
     const interval = setInterval(() => {
       const { x, y, z } = camera.position
-
       socket?.emit(`cameraMove`, {
         position: [x, y, z],
-        rotation: [0, 0, 0],
         room: room,
         color: playerColor,
       } satisfies CameraMove)
     }, 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [camera.position, socket, room, playerColor])
 
   return (
     <group position={[-3.5, -0.5, -3.5]}>

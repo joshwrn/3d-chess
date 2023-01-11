@@ -20,18 +20,14 @@ export const useMessageState = create<{
 
 export const useOpponentState = create<{
   position: [number, number, number]
-  rotation: [number, number, number]
   mousePosition: [number, number, number]
   setPosition: (position: [number, number, number]) => void
-  setRotation: (rotation: [number, number, number]) => void
   setMousePosition: (mousePosition: [number, number, number]) => void
   name: string
   setName: (name: string) => void
 }>((set) => ({
   position: [0, 100, 0],
-  rotation: [0, 0, 0],
   setPosition: (position) => set({ position }),
-  setRotation: (rotation) => set({ rotation }),
   name: ``,
   setName: (name) => set({ name }),
   mousePosition: [0, 0, 0],

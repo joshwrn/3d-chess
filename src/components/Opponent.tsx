@@ -9,7 +9,7 @@ export const Opponent: FC = () => {
   const handleClick = () => {
     console.log(`click`)
   }
-  const { position, rotation, name } = useOpponentState((state) => state)
+  const { position, name } = useOpponentState((state) => state)
   const { playerColor } = usePlayerState((state) => state)
 
   const { smoothPosition } = useSpring({
@@ -17,7 +17,7 @@ export const Opponent: FC = () => {
   })
   return (
     <Float speed={7} rotationIntensity={0.05} floatIntensity={1}>
-      <animated.group position={smoothPosition} rotation={rotation}>
+      <animated.group position={smoothPosition}>
         <Html
           style={{
             width: `100px`,
