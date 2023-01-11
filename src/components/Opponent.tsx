@@ -1,5 +1,6 @@
 import type { FC } from 'react'
 
+import { animated, useSpring } from '@react-spring/three'
 import { Float, Html } from '@react-three/drei'
 
 import { useOpponentState, usePlayerState } from '@/state/player'
@@ -10,9 +11,13 @@ export const Opponent: FC = () => {
   }
   const { position, rotation, name } = useOpponentState((state) => state)
   const { playerColor } = usePlayerState((state) => state)
+
+  const { smoothPosition } = useSpring({
+    smoothPosition: position,
+  })
   return (
     <Float speed={7} rotationIntensity={0.05} floatIntensity={1}>
-      <group position={position} rotation={rotation}>
+      <animated.group position={smoothPosition} rotation={rotation}>
         <Html
           style={{
             width: `100px`,
@@ -40,7 +45,7 @@ export const Opponent: FC = () => {
             color={playerColor === `white` ? `#4b4b4b` : `#ffffff`}
           />
         </mesh>
-      </group>
+      </animated.group>
     </Float>
   )
 }

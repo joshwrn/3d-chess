@@ -25,7 +25,7 @@ import { RookComponent } from '@models/Rook'
 import { TileComponent } from '@models/Tile'
 import { useSpring, animated } from '@react-spring/three'
 import { OrbitControls } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useThree } from '@react-three/fiber'
 
 import { isKing } from '@/logic/pieces/king'
 import { isRook } from '@/logic/pieces/rook'
@@ -211,38 +211,19 @@ export const BoardComponent: FC<{
 
   const { camera } = useThree()
 
-  const [ownPosition, setOwnPosition] = useState<{
-    position: [number, number, number]
-    rotation: [number, number, number]
-  }>({
-    position: [0, 0, 0],
-    rotation: [0, 0, 0],
-  })
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const { x, y, z } = camera.position
 
-  useFrame(() => {
-    // just don't send if position hasn't changed
-    const { x, y, z } = camera.position
-    if (
-      x === ownPosition.position[0] &&
-      y === ownPosition.position[1] &&
-      z === ownPosition.position[2]
-    ) {
-      return
-    }
-    const { x: rx, y: ry, z: rz } = camera.rotation
-
-    setOwnPosition({
-      position: [x, y, z],
-      rotation: [rx, ry, rz],
-    })
-
-    socket?.emit(`cameraMove`, {
-      position: [x, y, z],
-      rotation: [rx, ry, rz],
-      room: room,
-      color: playerColor,
-    } satisfies CameraMove)
-  })
+      socket?.emit(`cameraMove`, {
+        position: [x, y, z],
+        rotation: [0, 0, 0],
+        room: room,
+        color: playerColor,
+      } satisfies CameraMove)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <group position={[-3.5, -0.5, -3.5]}>
