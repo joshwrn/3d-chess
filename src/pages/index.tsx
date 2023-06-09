@@ -79,7 +79,7 @@ export const Home: FC = () => {
       <GameOverScreen gameOver={gameOver} />
       <Toast />
       <Canvas shadows camera={{ position: [-12, 5, 6], fov: 50 }}>
-        <Environment preset="dawn" />
+        <Environment files={`dawn.hdr`} />
         <Opponent />
         <Border />
         <BoardComponent
