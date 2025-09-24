@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "src/pages/api/socket.ts": {
+      "maxDuration": 30
+    },
+    "src/pages/api/socket.io.ts": {
+      "maxDuration": 30
+    }
+  }
+}

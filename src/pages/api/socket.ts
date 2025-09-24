@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Socket, ServerOptions } from 'socket.io'
+import type { Socket } from 'socket.io'
 import { Server } from 'socket.io'
 
 import type { MakeMoveClient, MovingTo } from '@/components/Board'
@@ -36,8 +36,8 @@ export interface SocketClientToServer {
   resetGame: (Room: Room) => void
   playerLeft: (Room: Room) => void
   disconnect: (Room: Room) => void
-  disconnecting: (Room: any) => void
-  error: (Room: any) => void
+  disconnecting: (Room: Room) => void
+  error: (Room: Room) => void
   existingPlayer: (room: Room & { name: string }) => void
 }
 
@@ -61,21 +61,31 @@ export default function SocketHandler(
   req: NextApiRequest,
   res: NextApiResponse & {
     socket: {
-      server: ServerOptions & {
-        io: Server
+      server: any & {
+        io?: Server
       }
     }
   },
 ): void {
-  // It means that socket server was already initialized
   if (res?.socket?.server?.io) {
-    console.log(`Already set up`)
+    console.log(`Socket server already initialized`)
     res.end()
     return
   }
 
   const io = new Server<SocketClientToServer, SocketServerToClient>(
     res?.socket?.server,
+    {
+      cors: {
+        origin: `*`,
+        methods: [`GET`, `POST`],
+        credentials: true,
+      },
+      allowEIO3: true,
+      transports: [`polling`],
+      pingTimeout: 60000,
+      pingInterval: 25000,
+    },
   )
   res.socket.server.io = io
 

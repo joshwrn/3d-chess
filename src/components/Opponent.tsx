@@ -7,7 +7,7 @@ import { useOpponentState, usePlayerState } from '@/state/player'
 
 export const Opponent: FC = () => {
   const handleClick = () => {
-    console.log(`click`)
+    // Handle click event
   }
   const { position, name } = useOpponentState((state) => state)
   const { playerColor } = usePlayerState((state) => state)

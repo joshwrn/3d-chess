@@ -4,6 +4,9 @@ const nextConfig = {
   compiler: {
     emotion: true,
   },
+  experimental: {
+    serverComponentsExternalPackages: ['socket.io']
+  }
 }
 
 module.exports = nextConfig
