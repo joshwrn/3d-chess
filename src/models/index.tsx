@@ -23,13 +23,12 @@ export const PieceMaterial: FC<
   return (
     // @ts-ignore
     <animated.meshPhysicalMaterial
-      reflectivity={4}
-      color={color === `white` ? `#d9d9d9` : `#7c7c7c`}
-      emissive={isSelected ? `#733535` : `#000000`}
-      metalness={1}
-      roughness={0.5}
+      color={color === `white` ? `#b8beb0` : `#242923`}
+      emissive={isSelected ? `#748548` : `#000000`}
+      metalness={0.04}
+      roughness={0.9}
       attach="material"
-      envMapIntensity={0.2}
+      envMapIntensity={0.1}
       opacity={opacity}
       transparent={true}
       {...props}
